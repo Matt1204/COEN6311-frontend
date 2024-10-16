@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "uid": "1111",
+      "email": "admin@mail.com",
+      "password": "Qwer1234",
+      "role": "admin",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phoneNumber": "1234567890"
+    },
+    {
+      "uid": "2222",
+      "email": "nurse@mail.com",
+      "password": "Qwer1234",
+      "role": "nurse",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "phoneNumber": "2345678901"
+    },
+    {
+      "uid": "3333",
+      "email": "supervisor@mail.com",
+      "password": "Qwer1234",
+      "role": "supervisor",
+      "firstName": "Jeremy",
+      "lastName": "Clarkson",
+      "phoneNumber": "1115670000"
+    }
+  ]
+}
