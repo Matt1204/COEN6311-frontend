@@ -105,9 +105,19 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
             spacing={1}
             sx={{ listStyle: 'none', m: 0, p: 0 }}
           >
-            <NavItem title={'home'} toURL={'/home'} />
-            <NavItem title={'Profile Demo'} toURL={'/profile'} />
-            <NavItem title={'disabled'} toURL={'/home11'} disabled={true} />
+            <NavItem title={'home'} toURL={'/'} />
+            <NavItem
+              title={'pref_management(nurse)'}
+              toURL={'/preference-management'}
+            />
+            <NavItem
+              title={'req_management(supervisor)'}
+              toURL={'/request-management'}
+            />
+            <NavItem
+              title={'user-management(admin)'}
+              toURL={'/user-management'}
+            />
           </Stack>
         </Box>
       </Stack>

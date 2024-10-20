@@ -1,7 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '../views/home/Home';
 import Layout from '../views/layout/Layout';
-import ProfileDemo from '../views/demo3/ProfileDemo';
+import PreferenceManagement from '../views/nurse/preference_management/PreferenceManagement';
+import RequestManagement from '../views/supervisor/request_management/RequestManagement';
+import UserManagement from '../views/admin/user_management/UserManagement';
 import Auth from '../views/auth/Auth';
 
 // Define your routes
@@ -14,8 +16,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-      { path: 'home', element: <Home /> },
-      { path: 'profile', element: <ProfileDemo /> },
+      { path: '', element: <Home /> }, // default child component
+      { path: 'preference-management', element: <PreferenceManagement /> },
+      { path: 'request-management', element: <RequestManagement /> },
+      { path: 'user-management', element: <UserManagement /> },
     ],
   },
 ]);

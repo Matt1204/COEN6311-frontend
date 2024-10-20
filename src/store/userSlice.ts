@@ -1,46 +1,46 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-export type UserState = {
-  uid: string;
+type LoginParams = {
   email: string;
-  role: string;
+  // role: string;
   firstName: string;
   lastName: string;
-  phoneNumber: string;
+};
+
+type UserState = LoginParams & {
+  isAuthenticated: boolean;
 };
 
 const initialState: UserState = {
-  uid: '',
   email: '',
-  role: '',
+  // role: '',
   firstName: '',
   lastName: '',
-  phoneNumber: '',
+  // phoneNumber: '',
+  isAuthenticated: false,
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    logIn: (state, action: PayloadAction<UserState>) => {
-      const { uid, email, role, firstName, lastName, phoneNumber } =
-        action.payload;
-      state.uid = uid;
+    setUser: (state, action: PayloadAction<LoginParams>) => {
+      const { email, firstName, lastName } = action.payload;
       state.email = email;
-      state.role = role;
       state.firstName = firstName;
       state.lastName = lastName;
-      state.phoneNumber = phoneNumber;
+      // state.role = role;
+      state.isAuthenticated = true;
     },
-    logOut: state => {
-      state.uid = '';
+    removeUser: state => {
       state.email = '';
-      state.role = '';
       state.firstName = '';
       state.lastName = '';
-      state.phoneNumber = '';
+      // state.role = '';
+      // state.phoneNumber = '';
+      state.isAuthenticated = false;
     },
   },
 });
 
-export const { logIn, logOut } = userSlice.actions;
+export const { setUser, removeUser } = userSlice.actions;

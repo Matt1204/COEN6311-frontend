@@ -7,9 +7,11 @@ import {
 } from '../../shared/utils/validators';
 import { useFormReducer, State } from '../../shared/utils/useFormReducer'; // Update the import path as needed
 import useHttpHook from '../../shared/utils/useHttpHook';
-import { logIn } from '../../store/userSlice';
+import { setUser } from '../../store/userSlice';
 import { useAppDispatch } from '../../store/storeHooks';
 import { useNavigate } from 'react-router-dom';
+import { useDemoRequestQuery } from '../../store/apiSlice';
+import { useLoginMutation, useRegisterMutation } from './authApiSlice';
 
 type DummyUserType = {
   uid: string;
@@ -35,20 +37,35 @@ export default function Auth() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const [login] = useLoginMutation();
+  const [register] = useRegisterMutation();
+  // auto-revoked when re-render OR parameter changes
+  // const { data: demoRes, error: demoErr, isLoading } = useDemoRequestQuery({});
+  // console.log(demoRes);
+  // console.log(demoErr);
+
   const handleFormUpdate = (id: string, content: string, validity: boolean) => {
     formDispatch({ type: 'UPDATE', payload: { id, content, validity } });
   };
   const handleToSignup = () => {
     formDispatch({
       type: 'ADD_INPUT',
-      payload: { id: 'nameInput', content: '', validity: false },
+      payload: { id: 'firstNameInput', content: '', validity: false },
+    });
+    formDispatch({
+      type: 'ADD_INPUT',
+      payload: { id: 'lastNameInput', content: '', validity: false },
     });
     setIsLoginMode(false);
   };
   const handleToLogin = () => {
     formDispatch({
       type: 'REMOVE_INPUT',
-      payload: { id: 'nameInput', content: '', validity: false },
+      payload: { id: 'firstNameInput', content: '', validity: false },
+    });
+    formDispatch({
+      type: 'REMOVE_INPUT',
+      payload: { id: 'lastNameInput', content: '', validity: false },
     });
     setIsLoginMode(true);
   };
@@ -59,42 +76,37 @@ export default function Auth() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let url: string;
-    let postData;
-    let header;
-    if (isLoginMode) {
-      // login
-      url = '/user-dummy-data.json';
-      //   postData = {
-      //     email: ,
-      //     password: ,
-      //   };
-      //   postData = JSON.stringify(postData);
-      //   header = { 'Content-Type': 'application/json' };
-    } else {
-      // signup
-      url = '/user-dummy-data.json';
-      //   postData = new FormData();
-      //   postData.append()
-      //   header = { 'Content-Type': 'multipart/form-data' };
-    }
-    try {
-      //   const res = await httpRequest(url, postData, 'POST', header);
-      const res = await httpRequest(url, null, 'GET', {}); // Fetching all users from the dummy data
-      let loginUser = res.users.find((user: DummyUserType) => {
-        return user.email === formState.inputs.emailInput.content;
-      });
-      if (loginUser) {
-        const { password, ...payload } = loginUser;
-        console.log(payload);
-        dispatch(logIn(payload));
-        navigate('/home');
-      }
 
-      console.log(res);
-    } catch (error) {
-      // console.log(`Caught error submitting request: ${error}`);
-      console.error(error);
+    if (isLoginMode) {
+      try {
+        let res = await login({
+          email: formState.inputs.emailInput.content,
+          password: formState.inputs.pwdInput.content,
+        }).unwrap();
+        console.log(res);
+        dispatch(
+          setUser({
+            email: res.body.email,
+            firstName: res.body.firstName,
+            lastName: res.body.lastName,
+          })
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      try {
+        let res = await register({
+          email: formState.inputs.emailInput.content,
+          password: formState.inputs.pwdInput.content,
+          first_name: formState.inputs.firstNameInput.content,
+          last_name: formState.inputs.lastNameInput.content,
+        }).unwrap();
+        console.log(res);
+        handleToLogin();
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
@@ -127,24 +139,34 @@ export default function Auth() {
           onUpdate={handleFormUpdate}
         />
         {!isLoginMode && (
-          <CustomInput
-            element="input"
-            id="nameInput"
-            defaultContent=""
-            defaultValidity={false}
-            label="Your name (label)"
-            type="text"
-            placeholder="Enter your name"
-            errorText="Name is required."
-            validators={[VALIDATOR_REQUIRE()]}
-            onUpdate={handleFormUpdate}
-          />
+          <div>
+            <CustomInput
+              element="input"
+              id="firstNameInput"
+              defaultContent=""
+              defaultValidity={false}
+              label="Your first name:"
+              type="text"
+              placeholder="first name"
+              errorText="first name required."
+              validators={[VALIDATOR_REQUIRE()]}
+              onUpdate={handleFormUpdate}
+            />
+            <CustomInput
+              element="input"
+              id="lastNameInput"
+              defaultContent=""
+              defaultValidity={false}
+              label="Your last name:"
+              type="text"
+              placeholder="last name"
+              errorText="last name required"
+              validators={[VALIDATOR_REQUIRE()]}
+              onUpdate={handleFormUpdate}
+            />
+          </div>
         )}
-        {isLoginMode ? (
-          <button onClick={handleToSignup}>To Sign-up</button>
-        ) : (
-          <button onClick={handleToLogin}>To Log-in</button>
-        )}
+
         {isLoginMode ? (
           <button type="submit" disabled={!formState.masterValidity}>
             Sign in
@@ -155,6 +177,11 @@ export default function Auth() {
           </button>
         )}
       </form>
+      {isLoginMode ? (
+        <button onClick={handleToSignup}>To Sign-up</button>
+      ) : (
+        <button onClick={handleToLogin}>To Log-in</button>
+      )}
     </>
   );
 }
