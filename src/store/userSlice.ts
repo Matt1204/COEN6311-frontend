@@ -2,22 +2,22 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 type LoginParams = {
   email: string;
-  // role: string;
   firstName: string;
   lastName: string;
+  role: string;
+  accessToken: string;
 };
 
 type UserState = LoginParams & {
-  isAuthenticated: boolean;
+  accessToken: string;
 };
 
 const initialState: UserState = {
   email: '',
-  // role: '',
   firstName: '',
   lastName: '',
-  // phoneNumber: '',
-  isAuthenticated: false,
+  role: '',
+  accessToken: '',
 };
 
 export const userSlice = createSlice({
@@ -25,20 +25,20 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<LoginParams>) => {
-      const { email, firstName, lastName } = action.payload;
+      const { email, firstName, lastName, accessToken, role } = action.payload;
       state.email = email;
       state.firstName = firstName;
       state.lastName = lastName;
-      // state.role = role;
-      state.isAuthenticated = true;
+      state.role = role;
+      state.accessToken = accessToken;
     },
     removeUser: state => {
       state.email = '';
       state.firstName = '';
       state.lastName = '';
-      // state.role = '';
+      state.role = '';
       // state.phoneNumber = '';
-      state.isAuthenticated = false;
+      state.accessToken = '';
     },
   },
 });

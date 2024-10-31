@@ -9,19 +9,10 @@ import { useFormReducer, State } from '../../shared/utils/useFormReducer'; // Up
 import useHttpHook from '../../shared/utils/useHttpHook';
 import { setUser } from '../../store/userSlice';
 import { useAppDispatch } from '../../store/storeHooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDemoRequestQuery } from '../../store/apiSlice';
 import { useLoginMutation, useRegisterMutation } from './authApiSlice';
 
-type DummyUserType = {
-  uid: string;
-  email: string;
-  password: string;
-  role: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-};
 const initialState: State = {
   inputs: {
     emailInput: { id: 'emailInput', content: '', validity: false },
@@ -33,9 +24,11 @@ const initialState: State = {
 export default function Auth() {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { formState, formDispatch } = useFormReducer(initialState);
-  const { httpRequest } = useHttpHook();
+  // const { httpRequest } = useHttpHook();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const [login] = useLoginMutation();
   const [register] = useRegisterMutation();
@@ -86,12 +79,17 @@ export default function Auth() {
         console.log(res);
         dispatch(
           setUser({
-            email: res.body.email,
-            firstName: res.body.firstName,
-            lastName: res.body.lastName,
+            email: res.email,
+            firstName: res.first_name,
+            lastName: res.last_name,
+            accessToken: res.access_token,
+            role: res.role,
           })
         );
-      } catch (err) {
+        navigate(from, { replace: true });
+      } catch (err: any) {
+        console.log(`auth error: ${err}`);
+
         console.log(err);
       }
     } else {
@@ -104,8 +102,9 @@ export default function Auth() {
         }).unwrap();
         console.log(res);
         handleToLogin();
-      } catch (err) {
-        console.log(err);
+      } catch (err: any) {
+        console.log(`signup error:${err}`);
+        // console.log(err);
       }
     }
   };
@@ -178,9 +177,9 @@ export default function Auth() {
         )}
       </form>
       {isLoginMode ? (
-        <button onClick={handleToSignup}>To Sign-up</button>
+        <button onClick={handleToSignup}>To Sign-up mode</button>
       ) : (
-        <button onClick={handleToLogin}>To Log-in</button>
+        <button onClick={handleToLogin}>To Log-in mode</button>
       )}
     </>
   );
