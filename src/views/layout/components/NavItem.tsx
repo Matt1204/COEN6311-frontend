@@ -10,11 +10,7 @@ interface NavItemProps {
   disabled?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({
-  title,
-  toURL,
-  disabled = false,
-}) => {
+const NavItem: React.FC<NavItemProps> = ({ title, toURL, disabled = false }) => {
   // Styling for active and disabled states
   const activeStyle: SxProps<Theme> = {
     bgcolor: 'var(--NavItem-active-background)', // active background color
@@ -50,10 +46,7 @@ const NavItem: React.FC<NavItemProps> = ({
         })}
         disabled={disabled}
       >
-        <ListItemText
-          primary={title}
-          primaryTypographyProps={{ sx: textStyle }}
-        />
+        <ListItemText primary={title} primaryTypographyProps={{ sx: textStyle }} />
       </ListItemButton>
     </ListItem>
   );

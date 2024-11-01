@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from '../views/home/Home';
+import Home from '../views/public/Home';
 import Layout from '../views/layout/Layout';
-import PreferenceManagement from '../views/nurse/preference_management/PreferenceManagement';
-import RequestManagement from '../views/supervisor/request_management/RequestManagement';
-import UserManagement from '../views/admin/user_management/UserManagement';
+import PreferenceManagement from '../views/nurse/PreferenceManagement/PreferenceManagement';
+import RequestManagement from '../views/supervisor/RequestManagement/RequestManagement';
+import UserManagement from '../views/admin/UserManagement/UserManagement';
 import Auth from '../views/auth/Auth';
 
 // Define your routes

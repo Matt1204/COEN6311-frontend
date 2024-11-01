@@ -3,70 +3,116 @@
 // import viteLogo from '/vite.svg';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './views/layout/Layout';
-import Home from './views/home/Home';
-import PreferenceManagement from './views/nurse/preference_management/PreferenceManagement';
-import RequestManagement from './views/supervisor/request_management/RequestManagement';
-import UserManagement from './views/admin/user_management/UserManagement';
+import Home from './views/public/Home';
+import PreferenceManagement from './views/nurse/PreferenceManagement/PreferenceManagement';
+import RequestManagement from './views/supervisor/RequestManagement/RequestManagement';
+import UserManagement from './views/admin/UserManagement/UserManagement';
 import Auth from './views/auth/Auth';
 import RequireAuth from './views/auth/RequireAuth';
 import PersistLogin from './views/auth/persistLogin';
 import Missing from './views/components/Missing';
+import NurseSchedule from './views/nurse/NurseSchedule/NurseSchedule';
+import NurseTemplate from './views/nurse/NurseTemplate/NurseTemplate';
+import HospitalSchedule from './views/supervisor/HosipitalSchedule/HosipitalSchedule';
+import HospitalTemplate from './views/supervisor/HospitalTemplate/HospitalTemplate';
+import ScheduleManagement from './views/admin/ScheduleManagement/ScheduleManagement';
+import { Snackbar, Alert } from '@mui/material';
 
 import './App.css';
+import Unauthorized from './views/components/Unauthorized';
+import { useAppSelector, useAppDispatch } from './store/storeHooks';
+import { closeAlert } from './store/alertSlice';
 
 const routeRolesMap = {
   home: ['nurse', 'supervisor', 'admin'],
-  'preference-management': ['nurse'],
-  'request-management': ['supervisor'],
+  'my-schedule': ['nurse'],
+  'pref-management': ['nurse'],
+  'indi-template': ['nurse'],
+  'hospital-schedule': ['supervisor'],
+  'req-management': ['supervisor'],
+  'hospital-template': ['supervisor'],
   'user-management': ['admin'],
+  'schedule-management': ['admin'],
 };
 
 function App() {
+  let alertState = useAppSelector(state => state.alert);
+  const dispatch = useAppDispatch();
+
   return (
-    <Routes>
-      {/* public routes */}
-      <Route path="auth" element={<Auth />} />
+    <>
+      <Snackbar
+        open={alertState.visible}
+        autoHideDuration={2000}
+        onClose={() => {
+          dispatch(closeAlert());
+        }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => {
+            dispatch(closeAlert());
+          }}
+          severity={alertState.severity}
+          sx={{
+            width: '100%',
+            maxWidth: 400, // Fixed width for the Snackbar
+            '& .MuiAlert-message': {
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+            },
+          }}
+        >
+          {alertState.msg}
+        </Alert>
+      </Snackbar>
+      <Routes>
+        {/* public routes */}
+        <Route path="auth" element={<Auth />} />
 
-      {/* protected routes. must be authorized user, if not authorized, to login page */}
-      <Route element={<PersistLogin />}>
+        {/* protected routes. must be authorized user, if not authorized, to login page */}
         <Route path="/" element={<Layout />}>
-          <Route element={<RequireAuth allowedRoles={routeRolesMap['home']} />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route element={<PersistLogin />}>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['home']} />}>
+              <Route index element={<Home />} />
+            </Route>
 
-          <Route
-            element={
-              <RequireAuth
-                allowedRoles={routeRolesMap['preference-management']}
-              />
-            }
-          >
-            <Route
-              path="preference-management"
-              element={<PreferenceManagement />}
-            />
-          </Route>
+            {/* Routes for Nurses */}
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['my-schedule']} />}>
+              <Route path="my-schedule" element={<NurseSchedule />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['pref-management']} />}>
+              <Route path="pref-management" element={<PreferenceManagement />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['indi-template']} />}>
+              <Route path="indi-template" element={<NurseTemplate />} />
+            </Route>
 
-          <Route
-            element={
-              <RequireAuth allowedRoles={routeRolesMap['request-management']} />
-            }
-          >
-            <Route path="request-management" element={<RequestManagement />} />
-          </Route>
+            {/* Routes for Supervisors */}
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['hospital-schedule']} />}>
+              <Route path="hospital-schedule" element={<HospitalSchedule />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['req-management']} />}>
+              <Route path="req-management" element={<RequestManagement />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['hospital-template']} />}>
+              <Route path="hospital-template" element={<HospitalTemplate />} />
+            </Route>
 
-          <Route
-            element={
-              <RequireAuth allowedRoles={routeRolesMap['user-management']} />
-            }
-          >
-            <Route path="user-management" element={<UserManagement />} />
-          </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['user-management']} />}>
+              <Route path="user-management" element={<UserManagement />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['schedule-management']} />}>
+              <Route path="schedule-management" element={<ScheduleManagement />} />
+            </Route>
 
-          <Route path="*" element={<Missing />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<Missing />} />
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

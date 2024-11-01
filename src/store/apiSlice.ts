@@ -4,7 +4,6 @@ import {
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
-  QueryReturnValue,
 } from '@reduxjs/toolkit/query/react';
 import { RootState } from './store';
 import { removeUser, setUser } from './userSlice';
@@ -16,7 +15,6 @@ interface AuthResponse {
   last_name: string;
   role: string;
 }
-
 interface RefreshResponse {
   data: AuthResponse;
   meta: {
@@ -54,8 +52,7 @@ const baseQueryWithReauth: BaseQueryFn<
   // 401 => access token expiration
   if (result.error && result.error.status === 401) {
     console.log('! Original request failed with 401, trying to refresh token');
-    // const refreshResult: QueryReturnValue<unknown, FetchBaseQueryError, {}> =
-    //   await baseQuery('/refresh', api, extraOptions);
+    // send req to /refresh to refresh access token
     const refreshResult = await api.dispatch(
       apiSlice.endpoints.refreshToken.initiate()
     );
@@ -64,6 +61,7 @@ const baseQueryWithReauth: BaseQueryFn<
     // console.log(refreshResult);
 
     // if refresh is successful (RT is valid)
+    // refreshResult.data contains user info + new access token
     if ('data' in refreshResult) {
       const {
         access_token,
@@ -83,45 +81,19 @@ const baseQueryWithReauth: BaseQueryFn<
       );
       console.log('! refresh success, addUser()');
 
+      // re-try original request
       result = await baseQuery(args, api, extraOptions);
-
-      // if (access_token && email && firstName && lastName) {
-      //   console.log('! Token refreshed successfully, results: ');
-      //   console.log(
-      //     `Email: ${email}, First Name: ${firstName}, Last Name: ${lastName}`
-      //   );
-      //   api.dispatch(
-      //     setUser({
-      //       email: email,
-      //       firstName,
-      //       lastName,
-      //       accessToken: access_token,
-      //     })
-      //   );
-      //   result = await baseQuery(args, api, extraOptions);
-      // } else {
-      //   console.log('! Token refresh failed - missing expected data');
-      //   console.log('! removeUser()');
-
-      //   api.dispatch(removeUser());
-      // }
     } else {
-      // if refresh failed(RT expired)
-      // console.log('!  Token refresh failed');
+      // if token refresh failed(RT expired), return 403 error, force user re-login
       console.log('! removeUser()');
       api.dispatch(removeUser());
     }
   }
-  // console.log('! baseQueryWithReauth return');
-  // console.log(result, { replace: true });
-
   return result;
 };
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  // baseQuery: fetchBaseQuery({ baseUrl: 'http://127.0.0.1:5000/' }),
-  // baseQuery: baseQuery,
   baseQuery: baseQueryWithReauth,
   endpoints: builder => ({
     demoRequest: builder.query({

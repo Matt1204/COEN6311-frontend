@@ -7,12 +7,7 @@ import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 export default function Home() {
   let user = useAppSelector((state: RootState) => state.user);
   // auto-revoked when re-render OR parameter changes
-  const {
-    data: demoRes,
-    error: demoErr,
-    refetch,
-    ...demoQueryOthers
-  } = useDemoRequestQuery({});
+  const { data: demoRes, error: demoErr, refetch, ...demoQueryOthers } = useDemoRequestQuery({});
 
   useEffect(() => {
     // console.log('demoErr update:');
@@ -43,6 +38,7 @@ export default function Home() {
 
   return (
     <>
+      <h1>Home page(public, for debugging) </h1>
       {renders}
       <hr />
       <button onClick={() => refetch()}>send demo request</button>

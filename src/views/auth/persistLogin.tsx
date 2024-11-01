@@ -12,6 +12,7 @@ const PersistLogin = () => {
   useEffect(() => {
     let isMounted = true;
 
+    // revoked when browser refresh -> component re-mount
     const verifyRefreshToken = async () => {
       try {
         await refreshToken();
@@ -23,7 +24,9 @@ const PersistLogin = () => {
     };
 
     !accessToken ? verifyRefreshToken() : setIsLoading(false);
-    // return () => (isMounted = false);
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return <>{isLoading ? <p>Loading RT...</p> : <Outlet />}</>;

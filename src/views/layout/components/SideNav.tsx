@@ -1,17 +1,18 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import { NavLink } from 'react-router-dom';
+// import List from '@mui/material/List';
+// import ListItem from '@mui/material/ListItem';
+// import ListItemButton from '@mui/material/ListItemButton';
+// import ListItemText from '@mui/material/ListItemText';
+// import { NavLink } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Stack, SxProps, Theme } from '@mui/system';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import NavItem from './NavItem';
+import { useAppSelector } from '../../../store/storeHooks';
 
 interface SideNavProps {
   open: boolean;
@@ -21,6 +22,7 @@ interface SideNavProps {
 const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  let userRole = useAppSelector(state => state.user.role);
 
   const activeStyle: SxProps<Theme> = {
     bgcolor: 'var(--NavItem-active-background)', // active background color
@@ -33,6 +35,26 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
     fontWeight: 500,
     lineHeight: '28px',
   };
+
+  const navItems =
+    userRole == 'admin' ? (
+      <>
+        <NavItem title={'User Management(admin)'} toURL={'/user-management'} />
+        <NavItem title={'Schedule Management(admin)'} toURL={'/schedule-management'} />
+      </>
+    ) : userRole == 'nurse' ? (
+      <>
+        <NavItem title={'My Schedule(nurse)'} toURL={'/my-schedule'} />
+        <NavItem title={'Preference Management(nurse)'} toURL={'/pref-management'} />
+        <NavItem title={'Template Management(nurse)'} toURL={'/indi-template'} />
+      </>
+    ) : (
+      <>
+        <NavItem title={'Hospital Schedule(sup)'} toURL={'/hospital-schedule'} />
+        <NavItem title={'Requests Management(sup)'} toURL={'/req-management'} />
+        <NavItem title={'Template Management(sup)'} toURL={'/hospital-template'} />
+      </>
+    );
 
   return (
     <Drawer
@@ -100,24 +122,9 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
             p: '15px 8px',
           }}
         >
-          <Stack
-            component="ul"
-            spacing={1}
-            sx={{ listStyle: 'none', m: 0, p: 0 }}
-          >
+          <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
             <NavItem title={'home'} toURL={'/'} />
-            <NavItem
-              title={'pref_management(nurse)'}
-              toURL={'/preference-management'}
-            />
-            <NavItem
-              title={'req_management(supervisor)'}
-              toURL={'/request-management'}
-            />
-            <NavItem
-              title={'user-management(admin)'}
-              toURL={'/user-management'}
-            />
+            {navItems}
           </Stack>
         </Box>
       </Stack>

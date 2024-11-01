@@ -6,12 +6,15 @@ import {
   VALIDATOR_MINLENGTH,
 } from '../../shared/utils/validators';
 import { useFormReducer, State } from '../../shared/utils/useFormReducer'; // Update the import path as needed
-import useHttpHook from '../../shared/utils/useHttpHook';
 import { setUser } from '../../store/userSlice';
 import { useAppDispatch } from '../../store/storeHooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDemoRequestQuery } from '../../store/apiSlice';
 import { useLoginMutation, useRegisterMutation } from './authApiSlice';
+import { Box, Button, Container, Typography } from '@mui/material';
+
+import Grid from '@mui/material/Grid2';
+import { showAlert } from '../../store/alertSlice';
 
 const initialState: State = {
   inputs: {
@@ -22,16 +25,16 @@ const initialState: State = {
 };
 
 export default function Auth() {
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const { formState, formDispatch } = useFormReducer(initialState);
-  // const { httpRequest } = useHttpHook();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
-
   const [login] = useLoginMutation();
   const [register] = useRegisterMutation();
+
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const { formState, formDispatch } = useFormReducer(initialState);
+  // const { httpRequest } = useHttpHook();
   // auto-revoked when re-render OR parameter changes
   // const { data: demoRes, error: demoErr, isLoading } = useDemoRequestQuery({});
   // console.log(demoRes);
@@ -63,9 +66,9 @@ export default function Auth() {
     setIsLoginMode(true);
   };
 
-  useEffect(() => {
-    console.log('Form State Updated:', formState);
-  }, [formState.inputs, formState.masterValidity]);
+  // useEffect(() => {
+  //   console.log('Form State Updated:', formState);
+  // }, [formState.inputs, formState.masterValidity]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,7 +79,6 @@ export default function Auth() {
           email: formState.inputs.emailInput.content,
           password: formState.inputs.pwdInput.content,
         }).unwrap();
-        console.log(res);
         dispatch(
           setUser({
             email: res.email,
@@ -86,11 +88,23 @@ export default function Auth() {
             role: res.role,
           })
         );
+        dispatch(showAlert({ msg: `Hello ${res.first_name}`, severity: 'success' }));
         navigate(from, { replace: true });
       } catch (err: any) {
-        console.log(`auth error: ${err}`);
-
         console.log(err);
+
+        dispatch(showAlert({ msg: err.data.message, severity: 'error' }));
+        // msg
+        // if (!err?.originalStatus) {
+        //   // isLoading: true until timeout occurs
+        //   setErrMsg('No Server Response');
+        // } else if (err.originalStatus === 400) {
+        //   setErrMsg('Missing Username or Password');
+        // } else if (err.originalStatus === 401) {
+        //   setErrMsg('Unauthorized');
+        // } else {
+        //   setErrMsg('Login Failed');
+        // }
       }
     } else {
       try {
@@ -111,76 +125,108 @@ export default function Auth() {
 
   return (
     <>
-      <form onSubmit={handleFormSubmit}>
-        <CustomInput
-          element="input"
-          id="emailInput"
-          defaultContent={''}
-          defaultValidity={false}
-          label="Your email (label)"
-          type="email"
-          placeholder="email (placeholder)"
-          errorText="Please enter a valid email address."
-          validators={[VALIDATOR_REQUIRE(), VALIDATOR_EMAIL()]}
-          autoComplete="on"
-          onUpdate={handleFormUpdate}
-        />
-        <CustomInput
-          element="input"
-          id="pwdInput"
-          defaultContent={''}
-          defaultValidity={false}
-          label="Your password (label)"
-          type="password"
-          placeholder="Enter your password"
-          errorText="Password must be longer than 8 characters."
-          validators={[VALIDATOR_MINLENGTH(8)]}
-          onUpdate={handleFormUpdate}
-        />
-        {!isLoginMode && (
-          <div>
-            <CustomInput
-              element="input"
-              id="firstNameInput"
-              defaultContent=""
-              defaultValidity={false}
-              label="Your first name:"
-              type="text"
-              placeholder="first name"
-              errorText="first name required."
-              validators={[VALIDATOR_REQUIRE()]}
-              onUpdate={handleFormUpdate}
-            />
-            <CustomInput
-              element="input"
-              id="lastNameInput"
-              defaultContent=""
-              defaultValidity={false}
-              label="Your last name:"
-              type="text"
-              placeholder="last name"
-              errorText="last name required"
-              validators={[VALIDATOR_REQUIRE()]}
-              onUpdate={handleFormUpdate}
-            />
-          </div>
-        )}
-
-        {isLoginMode ? (
-          <button type="submit" disabled={!formState.masterValidity}>
-            Sign in
-          </button>
-        ) : (
-          <button type="submit" disabled={!formState.masterValidity}>
-            Sign up
-          </button>
-        )}
-      </form>
-      {isLoginMode ? (
-        <button onClick={handleToSignup}>To Sign-up mode</button>
-      ) : (
-        <button onClick={handleToLogin}>To Log-in mode</button>
-      )}
+      <Container
+        component="main"
+        sx={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            width: '100%', // Ensures the Box uses the Container's full width
+            maxWidth: 500, // Optional, for better control of form width
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 3, // Padding inside the Box for some spacing around
+            border: '1px solid #ccc', // Adds a border with a light grey color
+            borderRadius: '8px', // Sets a border radius of 8 pixels
+            backgroundColor: '#fff', // Optional: sets a white background color for the Box
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Optional: adds a subtle shadow for depth
+          }}
+        >
+          <Typography component="h1" variant="h5">
+            {isLoginMode ? 'Sign in' : 'Sign up'}
+          </Typography>
+          <Box component="form" onSubmit={handleFormSubmit} sx={{ mt: 3, width: '100%' }}>
+            <Grid container spacing={{ xs: 2, md: 4 }}>
+              <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+                <CustomInput
+                  element="input"
+                  id="emailInput"
+                  label="Email"
+                  type="email"
+                  placeholder="Enter your email"
+                  errorText="Please enter a valid email address."
+                  validators={[VALIDATOR_REQUIRE(), VALIDATOR_EMAIL()]}
+                  autoComplete="email"
+                  onUpdate={handleFormUpdate}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+                <CustomInput
+                  element="input"
+                  id="pwdInput"
+                  label="Password"
+                  type="password"
+                  placeholder="Enter your password"
+                  errorText="Password must be at least 8 characters."
+                  validators={[VALIDATOR_MINLENGTH(8)]}
+                  onUpdate={handleFormUpdate}
+                />
+              </Grid>
+              {!isLoginMode && (
+                <>
+                  <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+                    <CustomInput
+                      element="input"
+                      id="firstNameInput"
+                      label="First Name"
+                      type="text"
+                      placeholder="First name"
+                      errorText="First name is required."
+                      validators={[VALIDATOR_REQUIRE()]}
+                      onUpdate={handleFormUpdate}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+                    <CustomInput
+                      element="input"
+                      id="lastNameInput"
+                      label="Last Name"
+                      type="text"
+                      placeholder="Last name"
+                      errorText="Last name is required."
+                      validators={[VALIDATOR_REQUIRE()]}
+                      onUpdate={handleFormUpdate}
+                    />
+                  </Grid>
+                </>
+              )}
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={!formState.masterValidity}
+            >
+              {isLoginMode ? 'Sign In' : 'Sign Up'}
+            </Button>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={isLoginMode ? () => handleToSignup() : () => handleToLogin()}
+            >
+              {isLoginMode ? 'No account? Sign up' : 'have an account? Sign in'}
+            </Button>
+          </Box>
+        </Box>
+      </Container>
     </>
   );
 }

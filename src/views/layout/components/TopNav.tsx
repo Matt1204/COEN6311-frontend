@@ -11,27 +11,63 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import MessageIcon from '@mui/icons-material/Message';
+import { useLazyLogoutQuery } from '../../auth/authApiSlice';
+import { useAppDispatch } from '../../../store/storeHooks';
+import { removeUser } from '../../../store/userSlice';
+import CustomModal from '../../components/CustomModal';
 
 export default function TopNav() {
   const [navOpen, setNavOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
+  // log-out logic
+  const [triggerLogout, { ...others }] = useLazyLogoutQuery();
+  const handleLogout = async () => {
+    try {
+      const result = await triggerLogout().unwrap();
+      dispatch(removeUser());
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  // drop-town logic
   const handleAvatorOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleAvatorClose = () => {
     setAnchorEl(null);
   };
 
-  const handleUserProfile = () => {
-    navigate('/user-profile');
+  // user profile logic
+  const [profileVisibility, setProfileVisibility] = useState(false);
+  const handleOpenProfile = () => {
+    // navigate('/user-profile');
     handleAvatorClose();
+    setProfileVisibility(true);
+  };
+  const handleCloseProfile = () => {
+    setProfileVisibility(false);
+  };
+  const handleSubmitProfile = () => {
+    console.log('submit!!!');
   };
 
   return (
     <React.Fragment>
+      <CustomModal
+        open={profileVisibility}
+        onClose={handleCloseProfile}
+        title={'My Profile'}
+        onSubmit={handleSubmitProfile}
+      >
+        <Box sx={{ width: '100%', height: '700px', backgroundColor: '#eee' }}>
+          <p>asdf</p>
+        </Box>
+      </CustomModal>
       {/* container */}
       <Box
         component="header"
@@ -103,7 +139,8 @@ export default function TopNav() {
               open={!!anchorEl}
               onClose={handleAvatorClose}
             >
-              <MenuItem onClick={handleUserProfile}>User Profile</MenuItem>
+              <MenuItem onClick={handleOpenProfile}>User Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>Log out</MenuItem>
             </Menu>
           </Stack>
         </Stack>

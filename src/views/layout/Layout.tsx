@@ -5,14 +5,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import Container from '@mui/material/Container';
 import TopNav from './components/TopNav';
 
-import {
-  Box,
-  CssBaseline,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-} from '@mui/material';
+import { Box, CssBaseline, Drawer, List, ListItem, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import SideNav from './components/SideNav-old';
 
