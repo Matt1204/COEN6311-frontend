@@ -3,6 +3,7 @@ import { ValidatorObjType, validate } from '../../../shared/utils/validators';
 import { TextField } from '@mui/material';
 
 type CustomInputType = {
+  value: string;
   element: 'input' | 'textarea';
   id: string;
   type?: string; // This was already optional, no change needed here
@@ -29,6 +30,7 @@ type ActionType = {
 };
 
 export default function CustomInput({
+  value,
   element,
   id,
   type = 'text',
@@ -44,7 +46,8 @@ export default function CustomInput({
 }: CustomInputType) {
   // setting up the reducer
   const initialState: StateType = {
-    content: defaultContent,
+    // content: defaultContent,
+    content: value,
     validity: defaultValidity,
     isTouched: false,
   };
@@ -65,6 +68,12 @@ export default function CustomInput({
   }
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // 2-way binding, parent to child
+  useEffect(() => {
+    dispatch({ type: 'CHANGE', payload: value });
+  }, [value]);
+
+  // 2-way binding, child to parent
   useEffect(() => {
     // console.log(`${id} state.content: ${state.content}-${!!state.content}`);
     // console.log(`${id} state.validity: ${state.validity}`);
@@ -79,36 +88,6 @@ export default function CustomInput({
     dispatch({ type: 'TOUCH' });
   }
 
-  // const InputElement =
-  //   element === 'input' ? (
-  //     <input
-  //       id={id}
-  //       type={type}
-  //       placeholder={placeholder}
-  //       autoComplete={autoComplete}
-  //       onChange={handleChange}
-  //       onBlur={handleTouch}
-  //       value={state.content}
-  //     />
-  //   ) : (
-  //     <textarea
-  //       id={id}
-  //       rows={row || 3}
-  //       placeholder={placeholder}
-  //       autoComplete={autoComplete}
-  //       onChange={handleChange}
-  //       onBlur={handleTouch}
-  //       value={state.content}
-  //     />
-  //   );
-
-  // return (
-  //   <div>
-  //     <label htmlFor={id}>{label}</label>
-  //     {InputElement}
-  //     {!state.validity && state.isTouched && <p>{errorText}</p>}
-  //   </div>
-  // );
   return (
     <TextField
       variant="outlined"

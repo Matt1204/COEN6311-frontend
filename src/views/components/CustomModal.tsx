@@ -36,7 +36,7 @@ export default function CustomModal({
           overflowY: 'auto', // Enable scrolling if content overflows
           bgcolor: 'background.paper',
           borderRadius: '12px',
-          width: { xs: '90%', md: '55%' },
+          width: { xs: '90%', lg: '55%' },
         }}
       >
         <Box
@@ -67,9 +67,10 @@ export default function CustomModal({
           sx={{
             overflowY: 'auto',
             maxHeight: { xs: '70vh', md: '65vh' },
+            minHeight: '200px',
             borderTop: '1px solid #e0e0e0',
             borderBottom: '1px solid #e0e0e0',
-            p: 2,
+            p: 1,
             '::-webkit-scrollbar': {
               width: 0, // hides the scrollbar on WebKit browsers
             },

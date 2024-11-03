@@ -11,7 +11,16 @@ import { useAppDispatch } from '../../store/storeHooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDemoRequestQuery } from '../../store/apiSlice';
 import { useLoginMutation, useRegisterMutation } from './authApiSlice';
-import { Box, Button, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
 
 import Grid from '@mui/material/Grid2';
 import { showAlert } from '../../store/alertSlice';
@@ -52,6 +61,10 @@ export default function Auth() {
       type: 'ADD_INPUT',
       payload: { id: 'lastNameInput', content: '', validity: false },
     });
+    formDispatch({
+      type: 'ADD_INPUT',
+      payload: { id: 'roleInput', content: 'nurse', validity: true },
+    });
     setIsLoginMode(false);
   };
   const handleToLogin = () => {
@@ -63,12 +76,16 @@ export default function Auth() {
       type: 'REMOVE_INPUT',
       payload: { id: 'lastNameInput', content: '', validity: false },
     });
+    formDispatch({
+      type: 'REMOVE_INPUT',
+      payload: { id: 'roleInput', content: '', validity: false },
+    });
     setIsLoginMode(true);
   };
 
-  // useEffect(() => {
-  //   console.log('Form State Updated:', formState);
-  // }, [formState.inputs, formState.masterValidity]);
+  useEffect(() => {
+    console.log('Form State Updated:', formState);
+  }, [formState.inputs, formState.masterValidity]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -113,11 +130,15 @@ export default function Auth() {
           password: formState.inputs.pwdInput.content,
           first_name: formState.inputs.firstNameInput.content,
           last_name: formState.inputs.lastNameInput.content,
+          role: formState.inputs.roleInput.content,
         }).unwrap();
-        console.log(res);
+        // console.log(res.data);
+        dispatch(showAlert({ msg: `${res.email} registered`, severity: 'success' }));
         handleToLogin();
       } catch (err: any) {
-        console.log(`signup error:${err}`);
+        console.log(err);
+        dispatch(showAlert({ msg: err.data.message, severity: 'error' }));
+
         // console.log(err);
       }
     }
@@ -156,6 +177,7 @@ export default function Auth() {
             <Grid container spacing={{ xs: 2, md: 4 }}>
               <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
                 <CustomInput
+                  value={formState.inputs.emailInput.content as string}
                   element="input"
                   id="emailInput"
                   label="Email"
@@ -169,6 +191,7 @@ export default function Auth() {
               </Grid>
               <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
                 <CustomInput
+                  value={formState.inputs.pwdInput.content as string}
                   element="input"
                   id="pwdInput"
                   label="Password"
@@ -183,6 +206,7 @@ export default function Auth() {
                 <>
                   <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
                     <CustomInput
+                      value={formState.inputs.firstNameInput.content as string}
                       element="input"
                       id="firstNameInput"
                       label="First Name"
@@ -195,6 +219,7 @@ export default function Auth() {
                   </Grid>
                   <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
                     <CustomInput
+                      value={formState.inputs.lastNameInput.content as string}
                       element="input"
                       id="lastNameInput"
                       label="Last Name"
@@ -204,6 +229,23 @@ export default function Auth() {
                       validators={[VALIDATOR_REQUIRE()]}
                       onUpdate={handleFormUpdate}
                     />
+                  </Grid>
+                  <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+                    <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                      <InputLabel id="role-label">role</InputLabel>
+                      <Select
+                        labelId="role-label"
+                        id="role"
+                        label="label"
+                        value={formState.inputs.roleInput.content}
+                        onChange={e => {
+                          handleFormUpdate('roleInput', e.target.value as string, true);
+                        }}
+                      >
+                        <MenuItem value={'nurse'}>nurse</MenuItem>
+                        <MenuItem value={'supervisor'}>supervisor</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Grid>
                 </>
               )}
