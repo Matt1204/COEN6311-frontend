@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { apiSlice } from '../../store/apiSlice';
+import { apiSlice } from '../../store/apiSlices/apiSlice';
 import { setUser, removeUser } from '../../store/userSlice';
 
 export const useRefreshToken = () => {

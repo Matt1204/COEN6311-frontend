@@ -13,9 +13,9 @@ type CustomModalProps = {
 
 export default function CustomModal({
   open,
-  onClose,
   title,
   children,
+  onClose,
   onSubmit,
   showSubmitBtn = true,
   disableSubmitBtn = false,
@@ -47,6 +47,7 @@ export default function CustomModal({
             p: '5px',
             bgcolor: '#eee', // Custom background color for footer
             height: '60px',
+            borderBottom: 'solid 1px #475862',
           }}
         >
           <Typography
@@ -70,7 +71,7 @@ export default function CustomModal({
             minHeight: '200px',
             borderTop: '1px solid #e0e0e0',
             borderBottom: '1px solid #e0e0e0',
-            p: 1,
+            p: '3px 0',
             '::-webkit-scrollbar': {
               width: 0, // hides the scrollbar on WebKit browsers
             },
@@ -88,6 +89,7 @@ export default function CustomModal({
             p: '15px',
             bgcolor: '#eee', // Custom background color for footer
             height: '70px',
+            borderTop: 'solid 1px #475862',
           }}
         >
           <Button onClick={onClose} variant="outlined" color="inherit">

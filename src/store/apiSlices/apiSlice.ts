@@ -5,8 +5,8 @@ import {
   FetchArgs,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
-import { RootState } from './store';
-import { removeUser, setUser } from './userSlice';
+import { RootState } from '../store';
+import { removeUser, setUser } from '../userSlice';
 
 interface AuthResponse {
   access_token: string;
@@ -29,7 +29,7 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: (headers, { getState }) => {
     // Access the accessToken from the user slice of the Redux state
     const token = (getState() as RootState).user.accessToken;
-    // console.log(`prepareHeaders: ${token}`);
+    console.log(`Bearer ${token}`);
 
     // If a token is available, set it in the Authorization header
     if (token) {
@@ -53,9 +53,7 @@ const baseQueryWithReauth: BaseQueryFn<
   if (result.error && result.error.status === 401) {
     console.log('! Original request failed with 401, trying to refresh token');
     // send req to /refresh to refresh access token
-    const refreshResult = await api.dispatch(
-      apiSlice.endpoints.refreshToken.initiate()
-    );
+    const refreshResult = await api.dispatch(apiSlice.endpoints.refreshToken.initiate());
 
     // console.log('! refresh results: ');
     // console.log(refreshResult);
@@ -95,6 +93,7 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
+  tagTypes: ['User'],
   endpoints: builder => ({
     demoRequest: builder.query({
       query: () => ({

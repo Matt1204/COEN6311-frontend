@@ -77,6 +77,8 @@ export default function CustomInput({
   useEffect(() => {
     // console.log(`${id} state.content: ${state.content}-${!!state.content}`);
     // console.log(`${id} state.validity: ${state.validity}`);
+    // console.log(`${id} input updates: ${state.content}`);
+
     onUpdate(id, state.content, state.validity);
   }, [state.content, state.validity]);
 

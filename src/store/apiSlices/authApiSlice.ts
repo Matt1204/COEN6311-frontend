@@ -1,6 +1,6 @@
 // src/features/api/authApiSlice.ts
 
-import { apiSlice } from '../../store/apiSlice';
+import { apiSlice } from './apiSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({

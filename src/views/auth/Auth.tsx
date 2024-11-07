@@ -9,8 +9,9 @@ import { useFormReducer, State } from '../../shared/utils/useFormReducer'; // Up
 import { setUser } from '../../store/userSlice';
 import { useAppDispatch } from '../../store/storeHooks';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDemoRequestQuery } from '../../store/apiSlice';
-import { useLoginMutation, useRegisterMutation } from './authApiSlice';
+import { useDemoRequestQuery } from '../../store/apiSlices/apiSlice';
+import { useLoginMutation, useRegisterMutation } from '../../store/apiSlices/authApiSlice';
+import { useFetchAllHospitalsQuery, Hospital } from '../../store/apiSlices/hospitalApiSlice';
 import {
   Box,
   Button,
@@ -20,17 +21,38 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Rating,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 import Grid from '@mui/material/Grid2';
 import { showAlert } from '../../store/alertSlice';
+import { z } from 'zod';
+import { Password } from '@mui/icons-material';
 
-const initialState: State = {
-  inputs: {
-    emailInput: { id: 'emailInput', content: '', validity: false },
-    pwdInput: { id: 'pwdInput', content: '', validity: false },
-  },
-  masterValidity: false,
+// Define the validation schema using Zod for the form fields.
+// Initial schema definition with Zod.
+let formSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  password: z.string().min(8, { message: 'Must be 8 or more characters long' }),
+  firstName: z.string({ message: 'First name is required' }),
+  lastName: z.string({ message: 'Last name is required' }),
+  role: z.string({ message: 'Role is required' }),
+  seniority: z
+    .number()
+    .gte(1, { message: 'Seniority must be selected' })
+    .lte(10, { message: 'Seniority must be selected' }),
+  hospitalId: z.number({ message: 'hospital musted be selected' }),
+});
+type FormSchemaType = z.infer<typeof formSchema>;
+
+type Input = { content: string | number; errorMessage: string; isFocused: boolean };
+type FormState = Record<string, Input>;
+const initialFormState: FormState = {
+  email: { content: '', errorMessage: '', isFocused: false },
+  password: { content: '', errorMessage: '', isFocused: false },
 };
 
 export default function Auth() {
@@ -40,61 +62,134 @@ export default function Auth() {
   const from = location.state?.from?.pathname || '/';
   const [login] = useLoginMutation();
   const [register] = useRegisterMutation();
+  useEffect(() => {
+    if (from !== '/') {
+      dispatch(showAlert({ msg: `Your session is out.` }));
+    }
+  }, []);
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const {
+    data: hospitalsData,
+    error: fetchHospitalsErr,
+    isLoading: fetchHospitalsLoading,
+  } = useFetchAllHospitalsQuery(undefined);
+  useEffect(() => {
+    if (hospitalsData?.data) {
+      setHospitals(hospitalsData.data);
+    }
+  }, [hospitalsData]);
 
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const { formState, formDispatch } = useFormReducer(initialState);
-  // const { httpRequest } = useHttpHook();
-  // auto-revoked when re-render OR parameter changes
-  // const { data: demoRes, error: demoErr, isLoading } = useDemoRequestQuery({});
-  // console.log(demoRes);
-  // console.log(demoErr);
+  // Initializing FormState
+  const [formState, setFormState] = useState<FormState>(initialFormState);
+  // const [formValidity, setFormValidity] = useState<boolean | null>();
+  // const checkFormValidity = () => {
+  //   return Object.values(formState).every(input => input.errorMessage === '');
+  // };
+  // useEffect(() => {
+  //   console.log("check validity");
+  //   setFormValidity(() => checkFormValidity());
+  // }, [formState]);
 
-  const handleFormUpdate = (id: string, content: string, validity: boolean) => {
-    formDispatch({ type: 'UPDATE', payload: { id, content, validity } });
+  const handleFormChange = (field: keyof FormSchemaType, value: any) => {
+    if (field) {
+      // setFormState(prev => ({ ...prev, [field]: value }));
+      let validity = formSchema.shape[field]?.safeParse(value);
+      const errorMessage = validity.success ? '' : validity.error.errors[0].message;
+      setFormState(prevState => {
+        const newState = {
+          ...prevState,
+          [field]: { ...prevState[field], content: value, errorMessage: errorMessage },
+        };
+        return newState;
+      });
+    }
   };
+  const handleFormBlur = (field: keyof FormSchemaType) => {
+    setFormState(prevState => {
+      const newState = {
+        ...prevState,
+        [field]: { ...prevState[field], isFocused: false },
+      };
+      return newState;
+    });
+  };
+  const handleFormFocus = (field: keyof FormSchemaType) => {
+    setFormState(prevState => {
+      const newState = {
+        ...prevState,
+        [field]: { ...prevState[field], isFocused: true },
+      };
+      return newState;
+    });
+  };
+  const addInputs = (dataList: { field: keyof FormSchemaType; value: string | number }[]) => {
+    // Extend the existing form schema with new fields
+    const addFormData: FormState = {};
+    dataList.forEach(ele => {
+      const validity = formSchema.shape[ele.field].safeParse(ele.value);
+      const errorMessage = validity.success ? '' : validity.error.errors[0].message;
+      addFormData[ele.field] = { content: ele.value, errorMessage, isFocused: false };
+    });
+
+    // Update the form state with new data
+    setFormState(prevState => ({
+      ...prevState,
+      ...addFormData,
+    }));
+  };
+  const removeInputs = (keysToRemove: (keyof FormSchemaType)[]) => {
+    setFormState(prevState => {
+      // Create a new state object that excludes the specified keys
+      const newState = { ...prevState };
+      keysToRemove.forEach(key => {
+        delete newState[key];
+      });
+      return newState;
+    });
+  };
+  useEffect(() => {
+    console.log('Watch formState:', formState);
+  }, [formState]);
+
+  // Switching Sing-in, Sign-up
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const handleToSignup = () => {
-    formDispatch({
-      type: 'ADD_INPUT',
-      payload: { id: 'firstNameInput', content: '', validity: false },
-    });
-    formDispatch({
-      type: 'ADD_INPUT',
-      payload: { id: 'lastNameInput', content: '', validity: false },
-    });
-    formDispatch({
-      type: 'ADD_INPUT',
-      payload: { id: 'roleInput', content: 'nurse', validity: true },
-    });
     setIsLoginMode(false);
+    addInputs([
+      { field: 'firstName', value: '' },
+      { field: 'lastName', value: '' },
+      { field: 'role', value: 'nurse' },
+      { field: 'seniority', value: 5 },
+    ]);
   };
   const handleToLogin = () => {
-    formDispatch({
-      type: 'REMOVE_INPUT',
-      payload: { id: 'firstNameInput', content: '', validity: false },
-    });
-    formDispatch({
-      type: 'REMOVE_INPUT',
-      payload: { id: 'lastNameInput', content: '', validity: false },
-    });
-    formDispatch({
-      type: 'REMOVE_INPUT',
-      payload: { id: 'roleInput', content: '', validity: false },
-    });
     setIsLoginMode(true);
+    removeInputs(['firstName', 'lastName', 'role', 'seniority', 'hospitalId']);
   };
 
-  useEffect(() => {
-    console.log('Form State Updated:', formState);
-  }, [formState.inputs, formState.masterValidity]);
+  const roleOptions = ['nurse', 'supervisor'] as const;
+  type Role = (typeof roleOptions)[number]; // Type will be 'nurse' | 'supervisor'
+  const handleRoleChange = (newRole: string) => {
+    handleFormChange('role', newRole);
+
+    if (newRole == 'nurse') {
+      removeInputs(['hospitalId']);
+      addInputs([{ field: 'seniority', value: 5 }]);
+    }
+    if (newRole == 'supervisor') {
+      removeInputs(['seniority']);
+      addInputs([{ field: 'hospitalId', value: hospitalsData?.data[0]?.h_id || 0 }]);
+    }
+  };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    console.log('submit');
     if (isLoginMode) {
       try {
         let res = await login({
-          email: formState.inputs.emailInput.content,
-          password: formState.inputs.pwdInput.content,
+          email: formState.email.content,
+          password: formState.password.content,
         }).unwrap();
         dispatch(
           setUser({
@@ -111,28 +206,26 @@ export default function Auth() {
         console.log(err);
 
         dispatch(showAlert({ msg: err.data.message, severity: 'error' }));
-        // msg
-        // if (!err?.originalStatus) {
-        //   // isLoading: true until timeout occurs
-        //   setErrMsg('No Server Response');
-        // } else if (err.originalStatus === 400) {
-        //   setErrMsg('Missing Username or Password');
-        // } else if (err.originalStatus === 401) {
-        //   setErrMsg('Unauthorized');
-        // } else {
-        //   setErrMsg('Login Failed');
-        // }
       }
     } else {
       try {
-        let res = await register({
-          email: formState.inputs.emailInput.content,
-          password: formState.inputs.pwdInput.content,
-          first_name: formState.inputs.firstNameInput.content,
-          last_name: formState.inputs.lastNameInput.content,
-          role: formState.inputs.roleInput.content,
-        }).unwrap();
-        // console.log(res.data);
+        let addOn = {};
+        if (formState.role.content == 'nurse') {
+          addOn = { seniority: formState.seniority.content };
+        }
+        if (formState.role.content == 'supervisor') {
+          addOn = { hospital_id: formState.hospitalId.content };
+        }
+        let reqBody = {
+          email: formState.email.content,
+          password: formState.password.content,
+          first_name: formState.firstName.content,
+          last_name: formState.lastName.content,
+          role: formState.role.content,
+        };
+
+        let res = await register({ ...reqBody, ...addOn }).unwrap();
+        console.log(res.data);
         dispatch(showAlert({ msg: `${res.email} registered`, severity: 'success' }));
         handleToLogin();
       } catch (err: any) {
@@ -143,6 +236,46 @@ export default function Auth() {
       }
     }
   };
+
+  let renderForRole =
+    formState?.role?.content &&
+    (formState.role.content == 'nurse' ? (
+      <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+        <Typography component="legend">
+          Seniority level: {`${formState.seniority.content}`}
+        </Typography>
+        <Rating
+          value={formState.seniority.content as number}
+          onChange={(e, val) => {
+            val && handleFormChange('seniority', val);
+          }}
+          // defaultValue={5}
+          max={10}
+        />
+      </Grid>
+    ) : (
+      hospitalsData?.data && (
+        <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
+          <Autocomplete
+            // Props for customizing behavior
+            options={hospitalsData.data}
+            getOptionLabel={(option: Hospital) => option.h_name}
+            isOptionEqualToValue={(option, value) => option.h_id === value.h_id}
+            // defaultValue={hospitalsData.data[0]}
+            value={hospitalsData.data.find(
+              hospital => hospital.h_id == formState.hospitalId.content
+            )}
+            onChange={(event, newValue: Hospital | null) => {
+              newValue && handleFormChange('hospitalId', newValue?.h_id);
+            }}
+            renderInput={params => <TextField {...params} label="Select a Hospital" />}
+            disablePortal
+            disableClearable
+            blurOnSelect
+          />
+        </Grid>
+      )
+    ));
 
   return (
     <>
@@ -176,58 +309,111 @@ export default function Auth() {
           <Box component="form" onSubmit={handleFormSubmit} sx={{ mt: 3, width: '100%' }}>
             <Grid container spacing={{ xs: 2, md: 4 }}>
               <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
-                <CustomInput
-                  value={formState.inputs.emailInput.content as string}
-                  element="input"
-                  id="emailInput"
-                  label="Email"
-                  type="email"
-                  placeholder="Enter your email"
-                  errorText="Please enter a valid email address."
-                  validators={[VALIDATOR_REQUIRE(), VALIDATOR_EMAIL()]}
-                  autoComplete="email"
-                  onUpdate={handleFormUpdate}
+                <TextField
+                  variant="outlined"
+                  id={'emailInput'}
+                  label={'email'}
+                  placeholder={'input your email'}
+                  error={!!formState.email.errorMessage && !formState.email.isFocused}
+                  helperText={
+                    !!formState.email.errorMessage && !formState.email.isFocused
+                      ? formState.email.errorMessage
+                      : ''
+                  }
+                  // autoComplete={true}
+                  value={formState?.email.content}
+                  onChange={e => {
+                    handleFormChange('email', e.target.value);
+                  }}
+                  onBlur={() => {
+                    handleFormBlur('email');
+                  }}
+                  onFocus={() => {
+                    handleFormFocus('email');
+                  }}
+                  // onBlur={handleTouch}
+                  fullWidth
                 />
               </Grid>
               <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
-                <CustomInput
-                  value={formState.inputs.pwdInput.content as string}
-                  element="input"
-                  id="pwdInput"
-                  label="Password"
-                  type="password"
-                  placeholder="Enter your password"
-                  errorText="Password must be at least 8 characters."
-                  validators={[VALIDATOR_MINLENGTH(8)]}
-                  onUpdate={handleFormUpdate}
+                <TextField
+                  variant="outlined"
+                  id={'passwordInput'}
+                  label={'password'}
+                  placeholder={'input your password'}
+                  error={!!formState.password.errorMessage && !formState.password.isFocused}
+                  helperText={
+                    !!formState.password.errorMessage && !formState.password.isFocused
+                      ? formState.password.errorMessage
+                      : ''
+                  }
+                  // autoComplete={autoComplete}
+                  value={formState?.password.content}
+                  onChange={e => {
+                    handleFormChange('password', e.target.value);
+                  }}
+                  onBlur={() => {
+                    handleFormBlur('password');
+                  }}
+                  onFocus={() => {
+                    handleFormFocus('password');
+                  }}
+                  // onBlur={handleTouch}
+                  fullWidth
                 />
               </Grid>
-              {!isLoginMode && (
+              {!isLoginMode && formState?.firstName && formState?.lastName && formState?.role && (
                 <>
                   <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
-                    <CustomInput
-                      value={formState.inputs.firstNameInput.content as string}
-                      element="input"
-                      id="firstNameInput"
-                      label="First Name"
-                      type="text"
-                      placeholder="First name"
-                      errorText="First name is required."
-                      validators={[VALIDATOR_REQUIRE()]}
-                      onUpdate={handleFormUpdate}
+                    <TextField
+                      variant="outlined"
+                      id={'firstNameInput'}
+                      label={'first name'}
+                      placeholder={'input your first name'}
+                      error={!!formState.firstName.errorMessage && !formState.firstName.isFocused}
+                      helperText={
+                        !!formState.firstName.errorMessage && !formState.firstName.isFocused
+                          ? formState.firstName.errorMessage
+                          : ''
+                      }
+                      // autoComplete={true}
+                      value={formState?.firstName.content}
+                      onChange={e => {
+                        handleFormChange('firstName', e.target.value);
+                      }}
+                      onBlur={() => {
+                        handleFormBlur('firstName');
+                      }}
+                      onFocus={() => {
+                        handleFormFocus('firstName');
+                      }}
+                      fullWidth
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
-                    <CustomInput
-                      value={formState.inputs.lastNameInput.content as string}
-                      element="input"
-                      id="lastNameInput"
-                      label="Last Name"
-                      type="text"
-                      placeholder="Last name"
-                      errorText="Last name is required."
-                      validators={[VALIDATOR_REQUIRE()]}
-                      onUpdate={handleFormUpdate}
+                    <TextField
+                      variant="outlined"
+                      id={'lastNameInput'}
+                      label={'last name'}
+                      placeholder={'input your last name'}
+                      error={!!formState.lastName.errorMessage && !formState.lastName.isFocused}
+                      helperText={
+                        !!formState.lastName.errorMessage && !formState.lastName.isFocused
+                          ? formState.lastName.errorMessage
+                          : ''
+                      }
+                      // autoComplete={true}
+                      value={formState?.lastName.content}
+                      onChange={e => {
+                        handleFormChange('lastName', e.target.value);
+                      }}
+                      onBlur={() => {
+                        handleFormBlur('lastName');
+                      }}
+                      onFocus={() => {
+                        handleFormFocus('lastName');
+                      }}
+                      fullWidth
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }} padding={{ xs: '10px', md: '0px' }}>
@@ -237,16 +423,26 @@ export default function Auth() {
                         labelId="role-label"
                         id="role"
                         label="label"
-                        value={formState.inputs.roleInput.content}
+                        value={formState?.role.content}
                         onChange={e => {
-                          handleFormUpdate('roleInput', e.target.value as string, true);
+                          if (e.target.value) {
+                            handleRoleChange(e.target.value as string);
+                            console.log(`role change: ${e.target.value}`);
+                          }
                         }}
                       >
-                        <MenuItem value={'nurse'}>nurse</MenuItem>
-                        <MenuItem value={'supervisor'}>supervisor</MenuItem>
+                        {roleOptions.map(role => {
+                          return (
+                            <MenuItem value={role} key={role}>
+                              {role}
+                            </MenuItem>
+                          );
+                        })}
+                        {/* <MenuItem value={'supervisor'}>supervisor</MenuItem> */}
                       </Select>
                     </FormControl>
                   </Grid>
+                  {renderForRole}
                 </>
               )}
             </Grid>
@@ -255,7 +451,7 @@ export default function Auth() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              disabled={!formState.masterValidity}
+              // disabled={!formValidity}
             >
               {isLoginMode ? 'Sign In' : 'Sign Up'}
             </Button>

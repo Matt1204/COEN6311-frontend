@@ -28,9 +28,7 @@ export const defaultInitialState: State = {
 };
 
 // Helper function to calculate master validity
-const calculateMasterValidity = (inputs: {
-  [id: string]: InputObjectType;
-}): boolean => {
+const calculateMasterValidity = (inputs: { [id: string]: InputObjectType }): boolean => {
   return Object.values(inputs).every(input => input.validity);
 };
 

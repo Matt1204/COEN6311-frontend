@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/storeHooks';
 import { RootState } from '../../store/store';
-import { useDemoRequestQuery } from '../../store/apiSlice';
+import { useDemoRequestQuery } from '../../store/apiSlices/apiSlice';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export default function Home() {
