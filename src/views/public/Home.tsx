@@ -26,10 +26,13 @@ export default function Home() {
   let renders = user.accessToken ? (
     <div>
       <h3>userSlice:</h3>
+      <p>
+        uId: {user.uId} {`(${typeof user.uId})`}
+      </p>
       <p>email: {user.email}</p>
       <p>role: {user.role}</p>
-      <p>first name: {user.firstName}</p>
-      <p>lasst name: {user.lastName}</p>
+      <p>firstName: {user.firstName}</p>
+      <p>lasstName: {user.lastName}</p>
       <p>accessToken: {user.accessToken}</p>
     </div>
   ) : (

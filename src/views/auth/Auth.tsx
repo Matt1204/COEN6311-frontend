@@ -129,6 +129,7 @@ export default function Auth() {
               lastName: res.last_name,
               accessToken: res.access_token,
               role: res.role,
+              uId: res.u_id,
             })
           );
           dispatch(showAlert({ msg: `Hello ${res.first_name}`, severity: 'success' }));

@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { z, ZodTypeAny, ZodRawShape } from 'zod';
 
+type InputContent = string | number | string[] | number[] | null;
+
 // Define a type for input fields
-type Input = { content: string | number; errorMessage: string; isFocused: boolean };
+type Input = {
+  // content: string | number | string[] | number[];
+  content: InputContent;
+  errorMessage: string;
+  isFocused: boolean;
+};
 
 // Form state type based on the schema keys
 type FormState<S extends ZodRawShape> = {
@@ -15,7 +22,7 @@ export function useFormState<S extends ZodRawShape>(formSchema: z.ZodObject<S>) 
   const [formState, setFormState] = useState<FormState<S>>({});
 
   // Function to handle input changes
-  const handleFormChange = (field: keyof S, value: string | number) => {
+  const handleFormChange = (field: keyof S, value: InputContent) => {
     let validity = formSchema.shape[field]?.safeParse(value);
     const errorMessage = validity.success ? '' : validity.error.errors[0].message;
     setFormState(prevState => ({
@@ -47,7 +54,7 @@ export function useFormState<S extends ZodRawShape>(formSchema: z.ZodObject<S>) 
 
   // Function to add inputs to the form
   //   const addInputs = (dataList: { field: keyof S; value: string | number }[]) => {
-  const addInputs = (dataList: { field: keyof S; value: string | number }[]) => {
+  const addInputs = (dataList: { field: keyof S; value: InputContent }[]) => {
     const newState: FormState<S> = {};
     dataList.forEach(({ field, value }) => {
       const validity = formSchema.shape[field]?.safeParse(value);

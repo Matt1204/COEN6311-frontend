@@ -16,6 +16,7 @@ export const useRefreshToken = () => {
         first_name: firstName,
         last_name: lastName,
         role,
+        u_id: uId,
       } = refreshResult;
 
       dispatch(
@@ -25,6 +26,7 @@ export const useRefreshToken = () => {
           lastName,
           role,
           accessToken: newAccessToken,
+          uId,
         })
       );
       console.log('- Refresh: RT valid, setUser()');

@@ -55,9 +55,11 @@ const Layout = () => {
               flexGrow: 1, // Allow content to grow and fill space
               display: 'flex', // Enable flexible layout
               flexDirection: 'column', // Stack content vertically
+              // backgroundColor: 'grey', // Background color of container
             }}
           >
-            <Container
+            <Outlet />
+            {/* <Container
               maxWidth="xl"
               sx={{
                 flexGrow: 1, // Ensure container grows to fill space
@@ -67,8 +69,8 @@ const Layout = () => {
               }}
               id="content-container"
             >
-              <Outlet />
-            </Container>
+              
+            </Container> */}
           </Box>
         </Box>
       </Box>

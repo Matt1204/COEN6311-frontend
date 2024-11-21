@@ -14,6 +14,7 @@ interface AuthResponse {
   first_name: string;
   last_name: string;
   role: string;
+  u_id: number;
 }
 interface RefreshResponse {
   data: AuthResponse;
@@ -29,7 +30,7 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: (headers, { getState }) => {
     // Access the accessToken from the user slice of the Redux state
     const token = (getState() as RootState).user.accessToken;
-    console.log(`Bearer ${token}`);
+    // console.log(`Bearer ${token}`);
 
     // If a token is available, set it in the Authorization header
     if (token) {
@@ -67,6 +68,7 @@ const baseQueryWithReauth: BaseQueryFn<
         first_name: firstName,
         last_name: lastName,
         role,
+        u_id: uId,
       } = (refreshResult as RefreshResponse).data;
       api.dispatch(
         setUser({
@@ -75,6 +77,7 @@ const baseQueryWithReauth: BaseQueryFn<
           lastName,
           role,
           accessToken: access_token,
+          uId,
         })
       );
       console.log('! refresh success, addUser()');

@@ -6,6 +6,7 @@ type LoginParams = {
   lastName: string;
   role: string;
   accessToken: string;
+  uId: number;
 };
 
 type UserState = LoginParams & {
@@ -18,6 +19,7 @@ const initialState: UserState = {
   lastName: '',
   role: '',
   accessToken: '',
+  uId: 0,
 };
 
 export const userSlice = createSlice({
@@ -25,12 +27,13 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<LoginParams>) => {
-      const { email, firstName, lastName, accessToken, role } = action.payload;
+      const { email, firstName, lastName, accessToken, role, uId } = action.payload;
       state.email = email;
       state.firstName = firstName;
       state.lastName = lastName;
       state.role = role;
       state.accessToken = accessToken;
+      state.uId = uId;
     },
     removeUser: state => {
       state.email = '';

@@ -1,5 +1,6 @@
 import React from 'react';
+import HospitalsRanking from '../PreferenceManagement/components/HospitalsRanking';
 
 export default function NurseTemplate() {
-  return <p>{'Nurse Template Page (Nurse)'}</p>;
+  return <>{'nurse template'}</>;
 }
