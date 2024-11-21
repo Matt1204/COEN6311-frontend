@@ -28,23 +28,28 @@ const Layout = () => {
       <Box
         sx={{
           display: 'flex',
-          // minHeight: '100vh', // Ensure the layout occupies full viewport height
           flexDirection: 'column',
-          position: 'relative',
-          minHeight: '100%',
+          // position: 'relative', !!!
+          // minHeight: '100%',
+
+          minHeight: '100vh', // Ensure the layout occupies full viewport height
+          height: '100vh',
+          maxHeight: '100vh',
         }}
       >
         <CssBaseline />
-
-        {/* <SideNav /> */}
-
         {/* Main Content Section */}
         <Box
           sx={{
             display: 'flex',
-            flex: '1 1 auto',
+            flex: '1 0 auto',
             flexDirection: 'column',
             pl: { lg: 'var(--SideNav-width)' },
+            overflow: 'hidden',
+
+            minHeight: '100vh', // Ensure the layout occupies full viewport height
+            height: '100vh',
+            maxHeight: '100vh',
           }}
           id="main-box"
         >
@@ -56,10 +61,22 @@ const Layout = () => {
               display: 'flex', // Enable flexible layout
               flexDirection: 'column', // Stack content vertically
               // backgroundColor: 'grey', // Background color of container
+              overflow: 'hidden',
+              // overflow: 'auto', // Allows scrolling within the main content area if content exceeds its container size
+              // height: 'calc(100vh - var(--TopNav-height))', // Height calculation to ensure it does not exceed viewport minus top navigation height
             }}
           >
             <Outlet />
-            {/* <Container
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
+};
+
+export default Layout;
+{
+  /* <Container
               maxWidth="xl"
               sx={{
                 flexGrow: 1, // Ensure container grows to fill space
@@ -70,12 +87,5 @@ const Layout = () => {
               id="content-container"
             >
               
-            </Container> */}
-          </Box>
-        </Box>
-      </Box>
-    </>
-  );
-};
-
-export default Layout;
+            </Container> */
+}

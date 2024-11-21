@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../store/storeHooks';
 import { RootState } from '../../store/store';
 import { useDemoRequestQuery } from '../../store/apiSlices/apiSlice';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { Box } from '@mui/material';
 
 export default function Home() {
   let user = useAppSelector((state: RootState) => state.user);
@@ -40,11 +41,11 @@ export default function Home() {
   );
 
   return (
-    <>
+    <Box sx={{ width: '100%', overflow: 'hidden' }}>
       <h1>Home page(public, for debugging) </h1>
       {renders}
       <hr />
       <button onClick={() => refetch()}>send demo request</button>
-    </>
+    </Box>
   );
 }

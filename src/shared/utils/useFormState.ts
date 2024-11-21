@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { z, ZodTypeAny, ZodRawShape } from 'zod';
 
-type InputContent = string | number | string[] | number[] | null;
+type InputContent = string | number | string[] | number[];
 
 // Define a type for input fields
 type Input = {
