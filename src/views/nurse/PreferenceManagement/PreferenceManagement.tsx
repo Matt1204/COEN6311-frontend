@@ -46,7 +46,7 @@ export default function PreferenceManagement() {
 
   const user = useAppSelector(state => state.user);
   const [startDate, setStartDate] = useState<Dayjs | undefined>();
-  const [endDate, setEndaDate] = useState<Dayjs | undefined>();
+  const [endDate, setEndDate] = useState<Dayjs | undefined>();
 
   // fetch preference data for chosen date (startDate)
   const { data: fetchPrefData, ...othersFetchPref } = useFetchPreferenceQuery(
@@ -204,7 +204,7 @@ export default function PreferenceManagement() {
           onDatesChange={(startDate, endDate) => {
             // console.log(date);
             setStartDate(startDate);
-            setEndaDate(endDate);
+            setEndDate(endDate);
           }}
         />
       </div>
@@ -227,7 +227,12 @@ export default function PreferenceManagement() {
             height: '100%', // !!!!
           }}
         >
-          <Grid container spacing={3} sx={{ padding: '15px 10px' }}>
+          <Grid
+            container
+            spacing={3}
+            // sx={{ padding: '15px 30px' }}
+            padding={{ xs: '15px 10px', lg: '15px 30px' }}
+          >
             {formState?.hoursPerWeek &&
               formState?.maxHoursPerShift &&
               formState?.preferredWeekDays &&

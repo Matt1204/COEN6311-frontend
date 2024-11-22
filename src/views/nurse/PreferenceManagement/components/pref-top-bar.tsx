@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField } from '@mui/material';
+import { Box, Typography, TextField, List } from '@mui/material';
 // import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 
@@ -67,7 +67,7 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
         justifyContent: 'space-between',
         alignContent: 'center',
         borderBottom: 'solid 1px #475862',
-        padding: '5px 5px',
+        padding: '0px 5px 2px 5px',
       }}
     >
       <Box
@@ -81,6 +81,7 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
           display: 'flex', // Keeps the layout flexible
           alignItems: 'center', // Centers the text vertically
           width: 'fit-content', // Adjusts width to the content size
+          height: '45px',
         }}
       >
         <Typography
@@ -90,7 +91,10 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
             fontWeight: isSubmitted ? 'bold' : 'regular', // Conditionally bolds the text based on submission status
           }}
         >
-          {`Status: ${isDue ? 'Due' : 'Open to submit'}`}
+          <List>
+            <li>{'Status: '}</li>
+            <li>{isDue ? 'Due' : 'Open to submit'}</li>
+          </List>
         </Typography>
       </Box>
       <Box>
@@ -99,11 +103,14 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
             label="Starting date"
             value={startDate}
             onChange={newValue => setSelectedDate(newValue)}
+            slotProps={{ textField: { size: 'small' } }}
           />
           <DatePicker
             label="Ending date"
             value={endDate}
             disabled
+            slotProps={{ textField: { size: 'small' } }}
+
             //   onChange={newValue => setSelectedDate(newValue)}
           />
         </LocalizationProvider>
@@ -130,6 +137,7 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
           display: 'flex', // Keeps the layout flexible
           alignItems: 'center', // Centers the text vertically
           width: 'fit-content', // Adjusts width to the content size
+          height: '45px',
         }}
       >
         <Typography
