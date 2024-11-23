@@ -1,13 +1,4 @@
-import {
-  VALIDATOR_REQUIRE,
-  VALIDATOR_EMAIL,
-  VALIDATOR_MINLENGTH,
-  VALIDATOR_MAXLENGTH,
-} from '../../../shared/utils/validators';
-
-import { useFormReducer, State } from '../../../shared/utils/useFormReducer';
 import CustomModal from '../../components/CustomModal';
-import CustomInput from '../../auth/components/CustomInput';
 import { Box, TextField, Autocomplete, Fab } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
@@ -18,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../store/storeHooks';
 import {
   useFetchUserQuery,
-  useLazyFetchUserQuery,
   useUpdateUserMutation,
   UpdateUser,
 } from '../../../store/apiSlices/userApiSlice';

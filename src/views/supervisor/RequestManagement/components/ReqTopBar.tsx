@@ -35,7 +35,7 @@ const ReqTopBar: React.FC<ReqTopBarProps> = ({ onDatesChange, onCreateClick }) =
         justifyContent: 'space-between',
         alignContent: 'center',
         borderBottom: 'solid 1px #475862',
-        padding: '2px 15px',
+        padding: '1px 8px 3px 8px',
       }}
     >
       <WeekSelector initDate={getNextWeekToSubmit()} onDatesChange={handleDatesChange} />

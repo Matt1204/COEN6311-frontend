@@ -12,6 +12,7 @@ import {
 import { useAppSelector } from '../../../store/storeHooks';
 import { Box } from '@mui/material';
 import TimeTable from './components/TimeTable';
+import RequestModal from './components/RequestModal';
 
 export interface ArrangedReqList {
   [key: string]: Request[][];
@@ -23,7 +24,7 @@ export default function RequestManagement() {
   const [startDate, setStartDate] = useState<Dayjs | undefined>();
   const [endDate, setEndDate] = useState<Dayjs | undefined>();
 
-  // Fetching Week Requests
+  // Fetching Week Requests Data
   const { data: fetchReqListData, ...othersFetchReqList } = useFetchReqListQuery(
     {
       supervisor_id: user.uId,
@@ -32,10 +33,11 @@ export default function RequestManagement() {
     },
     { skip: !startDate || !endDate, refetchOnMountOrArgChange: true }
   );
-  useEffect(() => {
-    console.log(`!!! fetched list:`, fetchReqListData);
-  }, [fetchReqListData]);
+  // useEffect(() => {
+  //   console.log(`!!! fetched list:`, fetchReqListData);
+  // }, [fetchReqListData]);
 
+  // Preparing Data for TimeTable
   const arrangedReqList = useMemo(() => {
     if (fetchReqListData) {
       // var newObject = cloneDeep(fetchReqListData);
@@ -59,44 +61,104 @@ export default function RequestManagement() {
   useEffect(() => {
     console.log('arrangedReqList:', arrangedReqList);
   }, [arrangedReqList]);
+  const isDue = useMemo(() => {
+    if (startDate) {
+      const today = dayjs();
+      const dayOfWeek = today.day();
+      const daysSinceMonday = (dayOfWeek + 6) % 7; // Adjust to make Monday (1) the start of the week, thus Monday will be 0
+      const currentMonday = today.subtract(daysSinceMonday, 'day');
+      const twoWeeksFromMonday = currentMonday.add(13, 'day');
+      // return twoWeeksFromMonday.isBefore(startDate);
+      return startDate.isBefore(twoWeeksFromMonday);
+    }
+  }, [startDate]);
 
-  const handleCreateReq = () => {
-    console.log('Create Request');
+  // Modal Logic
+  const [reqModalVisible, setReqModalVisible] = useState(false);
+  const [reqModalEditable, setReqModalEditable] = useState(false);
+  const [reqModalReqId, setReqModalReqId] = useState<number | undefined>();
+  // Close Modal
+  const handleModalClose = () => {
+    setReqModalVisible(false);
   };
+  // Create Request Modal
+  const handleCreateReq = () => {
+    setReqModalEditable(true);
+    setReqModalReqId(undefined);
+
+    setReqModalVisible(true);
+  };
+  // View Request Modal
+  const handleViewReq = (requestId: number) => {
+    setReqModalEditable(false);
+    setReqModalReqId(requestId);
+    console.log('View: ', requestId);
+
+    setReqModalVisible(true);
+  };
+  // Edit Request Modal
+  const handleEditReq = (requestId: number) => {
+    setReqModalEditable(true);
+    setReqModalReqId(requestId);
+    console.log('Edit: ', requestId);
+
+    setReqModalVisible(true);
+  };
+  // Delete Request
+  const handleDeleteReq = (requestId: number) => {};
 
   return (
-    <Box
-      sx={{
-        width: '100%', // !!!!!!!!
-        height: '100%', // !!!!!!!!
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'start',
-        p: '10px',
-        // backgroundColor: 'red',
-        // border: '2px solid red', // Adds a border with a light grey color
-      }}
-    >
-      <ReqTopBar
-        onCreateClick={handleCreateReq}
-        onDatesChange={(startDate, endDate) => {
-          setStartDate(startDate);
-          setEndDate(endDate);
-        }}
-      />
+    <>
+      {reqModalVisible && (
+        <RequestModal
+          visible={reqModalVisible}
+          editMode={reqModalEditable}
+          requestId={reqModalReqId}
+          onCloseModal={handleModalClose}
+        />
+      )}
+
       <Box
         sx={{
-          width: '100%',
+          width: '100%', // !!!!!!!!
+          height: '100%', // !!!!!!!!
           flexGrow: 1,
-          overflowY: 'scroll', // !!!!!
-          scrollbarWidth: 'none', // !!!
-          msOverflowStyle: 'none', // !!!!
-          border: '1px solid red', // Adds a border with a light grey color
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'start',
+          p: '10px 7px 3px 5px',
+          // backgroundColor: 'red',
+          // border: '2px solid red', // Adds a border with a light grey color
         }}
       >
-        {arrangedReqList && <TimeTable arrangedReqList={arrangedReqList as ArrangedReqList} />}
+        <ReqTopBar
+          onCreateClick={handleCreateReq}
+          onDatesChange={(startDate, endDate) => {
+            setStartDate(startDate);
+            setEndDate(endDate);
+          }}
+        />
+        <Box
+          sx={{
+            width: '100%',
+            flexGrow: 1,
+            overflowY: 'scroll', // !!!!!
+            scrollbarWidth: 'none', // !!!
+            msOverflowStyle: 'none', // !!!!
+            // border: '1px solid black', // Adds a border with a light grey color
+          }}
+        >
+          {arrangedReqList && (
+            <TimeTable
+              arrangedReqList={arrangedReqList as ArrangedReqList}
+              onViewItem={handleViewReq}
+              onEditItem={handleEditReq}
+              onDeleteItem={handleDeleteReq}
+              isDue={isDue as boolean}
+            />
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }

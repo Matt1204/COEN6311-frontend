@@ -121,6 +121,7 @@ export default function PreferenceManagement() {
           value: fetchPrefData.hospitals_ranking,
         },
       ];
+      console.log('Init formState:', dataList);
 
       addInputs(dataList);
     }
@@ -373,10 +374,8 @@ export default function PreferenceManagement() {
                   </Grid>
                   <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
                     <Autocomplete
-                      // Props for customizing behavior
                       options={['morning', 'afternoon', 'night']}
                       getOptionLabel={(option: string) => option}
-                      // isOptionEqualToValue={(option, value) => option.h_id === value.h_id}
                       value={formState.timeOfDay.content as string}
                       onChange={(event, newValue: string) => {
                         handleFormChange('timeOfDay', newValue);
