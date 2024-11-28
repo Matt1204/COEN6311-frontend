@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { ArrangedReqList } from '../RequestManagement';
 import {
@@ -21,9 +21,8 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
 import Groups3TwoToneIcon from '@mui/icons-material/Groups3TwoTone';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
-import { grey } from '@mui/material/colors';
 
-interface TimeTableProps {
+interface RequestTimetableProps {
   arrangedReqList: ArrangedReqList;
   onViewItem: (requestId: number) => void;
   onEditItem: (requestId: number) => void;
@@ -31,7 +30,7 @@ interface TimeTableProps {
   isDue: boolean;
 }
 
-const TimeTable: React.FC<TimeTableProps> = ({
+const RequestTimetable: React.FC<RequestTimetableProps> = ({
   arrangedReqList,
   onViewItem,
   onEditItem,
@@ -144,6 +143,7 @@ const TimeTable: React.FC<TimeTableProps> = ({
         </Box>
       </Box>
       <Box
+        id="tableBodyContainer"
         sx={{
           flex: '1',
           display: 'flex', // Elements are placed in a row
@@ -363,4 +363,4 @@ const TimeTable: React.FC<TimeTableProps> = ({
   );
 };
 
-export default TimeTable;
+export default RequestTimetable;

@@ -1,6 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import React, { useState, useEffect, useMemo } from 'react';
-import cloneDeep from 'lodash/cloneDeep';
+import { useState, useEffect, useMemo } from 'react';
 
 import WeekSelector from './components/WeekSelector';
 import ReqTopBar from './components/ReqTopBar';
@@ -11,7 +10,7 @@ import {
 } from '../../../store/apiSlices/requestApiSlice';
 import { useAppSelector } from '../../../store/storeHooks';
 import { Box } from '@mui/material';
-import TimeTable from './components/TimeTable';
+import RequestTimetable from './components/RequestTimetable';
 import RequestModal from './components/RequestModal';
 
 export interface ArrangedReqList {
@@ -149,7 +148,7 @@ export default function RequestManagement() {
           }}
         >
           {arrangedReqList && (
-            <TimeTable
+            <RequestTimetable
               arrangedReqList={arrangedReqList as ArrangedReqList}
               onViewItem={handleViewReq}
               onEditItem={handleEditReq}
