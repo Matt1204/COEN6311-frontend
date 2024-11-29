@@ -27,8 +27,8 @@ interface FetchHosShiftsResArgs {
 
 type FullHospitalShift = HospitalShift & {
   day_of_week: string;
-  supervisor_phone_number: string;
-  supervisor_address: string;
+  supervisor_phone_number: string | null;
+  supervisor_address: string | null;
   hospital_address: string;
   hospital_hotline: string;
 };
