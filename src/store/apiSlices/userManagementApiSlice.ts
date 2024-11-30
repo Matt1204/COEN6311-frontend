@@ -1,7 +1,7 @@
 import { apiSlice } from './apiSlice';
 import { UserFilterType } from '../../views/admin/UserManagement/components/UserFilter';
 
-interface User {
+export interface User {
   address: string;
   birthday: string;
   email: string;
@@ -33,19 +33,23 @@ export const userManagementApiSlice = apiSlice.injectEndpoints({
     fetchUserList: builder.query<FetchUserListRes, FetchUserListArgs>({
       query: ({ filter, page_size, currect_page }) => {
         let url = `user-management/get-user-list`;
-        if (page_size && currect_page) {
-          url += `?page_size=${encodeURIComponent(page_size)}&current_page=${encodeURIComponent(currect_page)}`;
-        }
 
-        // Convert the filter object into query parameters
+        const queryParams = new URLSearchParams();
+
+        // Convert the filter Object => query parameters String
         const appliedFilter = Object.entries(filter).filter(
           ([_, value]) => value !== '' && value !== null
         );
-        const queryParams = new URLSearchParams(
-          appliedFilter.map(([key, value]) => [key, String(value ?? '')]) // Convert values to strings
-        ).toString();
+        appliedFilter.forEach(([key, value]) => queryParams.append(key, String(value)));
+
+        if (page_size && currect_page) {
+          queryParams.append('page_size', String(page_size));
+          queryParams.append('current_page', String(currect_page));
+        }
+        console.log('queryParams ', queryParams);
+
         if (queryParams) {
-          url = url + `&${queryParams}`;
+          url = url + `?${queryParams}`;
         }
 
         console.log('URL: ', url);

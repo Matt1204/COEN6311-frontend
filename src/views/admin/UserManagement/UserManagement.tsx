@@ -14,12 +14,23 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import UserFilter, { UserFilterType, initialFilter } from './components/UserFilter';
+import UserFilter, { UserFilterType } from './components/UserFilter';
 import {
   useFetchUserListQuery,
   useLazyFetchUserListQuery,
 } from '../../../store/apiSlices/userManagementApiSlice';
 import { useFetchAllHospitalsQuery } from '../../../store/apiSlices/hospitalApiSlice';
+
+export const initialFilter: UserFilterType = {
+  email: '',
+  first_name: '',
+  last_name: '',
+  address: '',
+  phone_number: '',
+  role: '',
+  seniority: null,
+  hospital_id: null,
+};
 
 export default function UserManagement() {
   const { data: fetchedHospitals } = useFetchAllHospitalsQuery(undefined, {
@@ -109,7 +120,11 @@ export default function UserManagement() {
             width: '100%',
           }}
         >
-          <UserFilter onFilterUpdate={handleFilterUpdate} onFilterClear={initialFetch} />
+          <UserFilter
+            initialFilter={initialFilter}
+            onFilterUpdate={handleFilterUpdate}
+            onFilterClear={initialFetch}
+          />
           <Box>
             <Button
               variant="outlined"

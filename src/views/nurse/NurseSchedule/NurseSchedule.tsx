@@ -24,9 +24,18 @@ export interface ArrangedNurShiftList {
   [key: string]: NurseShift[];
 }
 
-export default function NurseSchedule() {
+interface NurseScheduleProps {
+  propUid?: number;
+}
+
+export default function NurseSchedule({ propUid }: NurseScheduleProps) {
   // Initialize the nurse to view
-  const userSlice = useAppSelector(state => state.user);
+  const userSliceUid = useAppSelector(state => state.user.uId);
+
+  const [nurseId, setNurseId] = useState<number | null>(null);
+  useEffect(() => {
+    setNurseId(propUid ? propUid : userSliceUid);
+  }, [propUid]);
 
   // handling starting and ending date
   const [startDate, setStartDate] = useState<Dayjs | undefined>();
@@ -34,11 +43,11 @@ export default function NurseSchedule() {
 
   const { data: fetchNurShiftList, ...othersFetchNurShiftList } = useFetchNurShiftListQuery(
     {
-      nurse_id: userSlice.uId,
+      nurse_id: nurseId as number,
       start_date: startDate?.format('YYYY-MM-DD') as string,
       end_date: endDate?.format('YYYY-MM-DD') as string,
     },
-    { skip: !(startDate || endDate), refetchOnMountOrArgChange: true }
+    { skip: !(startDate || endDate || nurseId), refetchOnMountOrArgChange: true }
   );
   // useEffect(() => {
   //   if (fetchNurShiftList) {
@@ -56,9 +65,9 @@ export default function NurseSchedule() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'start',
-          p: '10px 7px 3px 5px',
+          p: '6px 7px 3px 5px',
           // backgroundColor: 'red',
-          // border: '2px solid red', // Adds a border with a light grey color
+          border: '1px solid #000', // Adds a border with a light grey color
         }}
       >
         <Box
@@ -88,7 +97,7 @@ export default function NurseSchedule() {
             overflowY: 'scroll', // !!!!!
             scrollbarWidth: 'none', // !!!
             msOverflowStyle: 'none', // !!!!
-            border: '1px solid black', // Adds a border with a light grey color
+            // border: '1px solid black', // Adds a border with a light grey color
           }}
         >
           {fetchNurShiftList && (

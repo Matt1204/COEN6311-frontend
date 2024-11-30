@@ -30,23 +30,19 @@ export type UserFilterType = {
   hospital_id: number | null;
 };
 
-export const initialFilter: UserFilterType = {
-  email: '',
-  first_name: '',
-  last_name: '',
-  address: '',
-  phone_number: '',
-  role: '',
-  seniority: null,
-  hospital_id: null,
-};
-
 interface UserFilterProps {
+  initialFilter: UserFilterType;
   onFilterUpdate: (filter: UserFilterType) => void;
-  onFilterClear: () => void;
+  onFilterClear?: () => void;
+  nurseOnlyMode?: boolean;
 }
 
-const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }) => {
+const UserFilter: React.FC<UserFilterProps> = ({
+  initialFilter,
+  onFilterUpdate,
+  onFilterClear,
+  nurseOnlyMode = false,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [filter, setFilter] = useState(initialFilter);
 
@@ -65,7 +61,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }
   });
   const handleClearFilters = () => {
     setFilter(initialFilter);
-    onFilterClear();
+    onFilterClear && onFilterClear();
   };
 
   return (
@@ -85,7 +81,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }
           expandIcon={<ExpandMoreIcon />}
           sx={{
             padding: '0 16px',
-            backgroundColor: isFilterApplied ? '#91b896' : 'white',
+            backgroundColor: nurseOnlyMode ? 'white' : isFilterApplied ? '#91b896' : 'white',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -135,7 +131,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }
           <Grid container spacing={2}>
             {/* Input Fields */}
             {['email', 'first_name', 'last_name', 'address', 'phone_number'].map(field => (
-              <Grid size={{ xs: 12, lg: 4 }} key={field}>
+              <Grid size={{ xs: 12, lg: 6 }} key={field}>
                 <TextField
                   id={field}
                   label={field.charAt(0).toUpperCase() + field.slice(1)}
@@ -155,7 +151,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }
 
           <Grid container spacing={2}>
             {/* Role Selection */}
-            <Grid size={{ xs: 6 }}>
+            <Grid size={{ xs: 12 }}>
               <Autocomplete
                 options={['nurse', 'supervisor', 'admin']}
                 value={filter.role}
@@ -164,13 +160,14 @@ const UserFilter: React.FC<UserFilterProps> = ({ onFilterUpdate, onFilterClear }
                   handleFilterUpdate('seniority', null);
                   handleFilterUpdate('hospital_id', null);
                 }}
+                readOnly={nurseOnlyMode}
                 renderInput={params => <TextField {...params} label="Role" size="small" />}
               />
             </Grid>
 
             {/* Seniority Rating (if Role is Nurse) */}
             {filter.role === 'nurse' && (
-              <Grid size={{ xs: 6 }} display="flex" alignItems="center">
+              <Grid size={{ xs: 12 }} display="flex" alignItems="center">
                 <Typography component="legend" sx={{ mr: 2 }}>
                   Seniority:
                 </Typography>
