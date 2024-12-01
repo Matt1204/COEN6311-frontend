@@ -12,7 +12,7 @@ import RequireAuth from './views/auth/RequireAuth';
 import PersistLogin from './views/auth/persistLogin';
 import Missing from './views/components/Missing';
 import NurseSchedule from './views/nurse/NurseSchedule/NurseSchedule';
-import NurseTemplate from './views/nurse/NurseTemplate/NurseTemplate';
+import PrefTemplateManagement from './views/nurse/NurseTemplateManagement/PrefTemplateManagement';
 import HospitalSchedule from './views/supervisor/HosipitalSchedule/HosipitalSchedule';
 import HospitalTemplate from './views/supervisor/HospitalTemplate/HospitalTemplate';
 import ScheduleManagement from './views/admin/ScheduleManagement/ScheduleManagement';
@@ -86,7 +86,7 @@ function App() {
               <Route path="pref-management" element={<PreferenceManagement />} />
             </Route>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['indi-template']} />}>
-              <Route path="indi-template" element={<NurseTemplate />} />
+              <Route path="indi-template" element={<PrefTemplateManagement />} />
             </Route>
 
             {/* Routes for Supervisors */}

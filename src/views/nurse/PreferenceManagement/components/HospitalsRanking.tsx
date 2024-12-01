@@ -4,15 +4,15 @@ import { Box, Chip, Typography, Paper } from '@mui/material';
 import { Hospital, useFetchAllHospitalsQuery } from '../../../../store/apiSlices/hospitalApiSlice';
 
 interface HospitalsRankingProps {
-  disable: boolean;
+  disable?: boolean;
   initRanking: number[];
   onRankingChange: (newRanking: number[]) => void;
 }
 
 export default function HospitalsRanking({
-  disable,
   initRanking,
   onRankingChange,
+  disable = false,
 }: HospitalsRankingProps) {
   const { data: hospitalsData, isLoading: fetchHospitalsLoading } = useFetchAllHospitalsQuery();
 

@@ -56,7 +56,7 @@ export default function UserManagement() {
 
   // initial fetch
   const initialFetch = () => {
-    fetchUserList({ filter: initialFilter, page_size: pageSize, currect_page: currentPage });
+    fetchUserList({ filter: initialFilter, page_size: pageSize, current_page: currentPage });
   };
 
   // Fetch initial user list
@@ -71,7 +71,7 @@ export default function UserManagement() {
       fetchUserList({
         filter: filter as UserFilterType,
         page_size: pageSize,
-        currect_page: 1,
+        current_page: 1,
       });
   };
 
@@ -82,7 +82,7 @@ export default function UserManagement() {
     fetchUserList({
       filter: filter as UserFilterType,
       page_size: pageSize,
-      currect_page: value,
+      current_page: value,
     });
   };
 

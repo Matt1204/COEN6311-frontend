@@ -25,13 +25,13 @@ interface FetchUserListRes {
 interface FetchUserListArgs {
   filter: UserFilterType;
   page_size?: number;
-  currect_page?: number;
+  current_page?: number;
 }
 
 export const userManagementApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     fetchUserList: builder.query<FetchUserListRes, FetchUserListArgs>({
-      query: ({ filter, page_size, currect_page }) => {
+      query: ({ filter, page_size, current_page }) => {
         let url = `user-management/get-user-list`;
 
         const queryParams = new URLSearchParams();
@@ -42,17 +42,17 @@ export const userManagementApiSlice = apiSlice.injectEndpoints({
         );
         appliedFilter.forEach(([key, value]) => queryParams.append(key, String(value)));
 
-        if (page_size && currect_page) {
+        if (page_size && current_page) {
           queryParams.append('page_size', String(page_size));
-          queryParams.append('current_page', String(currect_page));
+          queryParams.append('current_page', String(current_page));
         }
-        console.log('queryParams ', queryParams);
+        // console.log('queryParams ', queryParams);
 
         if (queryParams) {
           url = url + `?${queryParams}`;
         }
 
-        console.log('URL: ', url);
+        // console.log('URL: ', url);
 
         return url;
       },
