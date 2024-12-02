@@ -26,6 +26,8 @@ import {
   CreatePreferenceData,
 } from '../../../store/apiSlices/preferenceApiSlice';
 import { showAlert } from '../../../store/alertSlice';
+import TemplateSelectionModal from './components/TemplateSelectionModal';
+import { PrefTemplateInputs } from '../NurseTemplateManagement/components/PrefTemplateForm';
 
 let formSchema = z.object({
   hoursPerWeek: z
@@ -59,9 +61,9 @@ export default function PreferenceManagement() {
       refetchOnMountOrArgChange: true,
     }
   );
-  useEffect(() => {
-    fetchPrefData && console.log('fetchPrefData: ', fetchPrefData);
-  }, [fetchPrefData]);
+  // useEffect(() => {
+  //   fetchPrefData && console.log('fetchPrefData: ', fetchPrefData);
+  // }, [fetchPrefData]);
 
   // calculate if current week is due(isDue => not editable, !isDue => editable)
   const isDue = useMemo(() => {
@@ -130,6 +132,27 @@ export default function PreferenceManagement() {
     console.log('watch formState:', formState);
   }, [formState]);
 
+  // Template Modal
+  const [templateModalVisible, setTemplateModalVisible] = useState(false);
+  const handleOpenTemplate = () => {
+    setTemplateModalVisible(true);
+  };
+  const handleSelectTemplate = (template: PrefTemplateInputs) => {
+    // console.log('HIT:', template);
+    const fieldsToRemove = Object.keys(template).map(key => key as keyof typeof formSchema.shape);
+    console.log('fieldsToRemove:', fieldsToRemove);
+    removeInputs(fieldsToRemove);
+
+    let dataList = Object.entries(template).map(([key, val]) => {
+      return { field: key as keyof typeof formSchema.shape, value: val };
+    });
+    addInputs(dataList);
+    console.log('dataList', dataList);
+    setTemplateModalVisible(false);
+
+    // addInputs(dataList);
+  };
+
   // Preference Update
   const [updatePreference, { ...updatePrefOthers }] = useUpdatePreferenceMutation();
   const handlePrefUpdate = async () => {
@@ -147,7 +170,7 @@ export default function PreferenceManagement() {
         console.log('!! Update: ', data);
 
         let res = await updatePreference(data).unwrap();
-        console.log('update res: ', res);
+        // console.log('update res: ', res);
         dispatch(showAlert({ msg: 'Preference Updated.', severity: 'success' }));
       } catch (error: any) {
         console.log('!!! Error Updating:', error);
@@ -175,7 +198,7 @@ export default function PreferenceManagement() {
         console.log('!! Create: ', data);
 
         let res = await createPreference(data).unwrap();
-        console.log('Create res: ', res);
+        // console.log('Create res: ', res);
         dispatch(showAlert({ msg: 'Preference Submitted', severity: 'success' }));
       } catch (error: any) {
         dispatch(showAlert({ msg: 'preference form invalid.', severity: 'error' }));
@@ -184,273 +207,289 @@ export default function PreferenceManagement() {
   };
 
   return (
-    <Box
-      id="pref-master-container"
-      sx={{
-        width: '100%', // !!!!!!!!
-        height: '100%', // !!!!!!!!
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'start',
-        p: '10px',
-        // backgroundColor: 'red',
-        // border: '2px solid red', // Adds a border with a light grey color
-      }}
-    >
-      <div>
-        <PrefTopBar
-          isDue={isDue as boolean}
-          isSubmitted={isSubmitted as boolean}
-          onDatesChange={(startDate, endDate) => {
-            // console.log(date);
-            setStartDate(startDate);
-            setEndDate(endDate);
+    <>
+      {templateModalVisible && (
+        <TemplateSelectionModal
+          onApplyTemplate={handleSelectTemplate}
+          visible={templateModalVisible}
+          onCloseModal={() => {
+            setTemplateModalVisible(false);
           }}
         />
-      </div>
-
+      )}
       <Box
-        id="pref-mid-container"
+        id="pref-master-container"
         sx={{
-          width: '100%',
+          width: '100%', // !!!!!!!!
+          height: '100%', // !!!!!!!!
           flexGrow: 1,
-          overflowY: 'scroll', // !!!!!
-          scrollbarWidth: 'none', // !!!
-          msOverflowStyle: 'none', // !!!!
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'start',
+          p: '10px',
+          // backgroundColor: 'red',
+          // border: '2px solid red', // Adds a border with a light grey color
         }}
       >
+        <div>
+          <PrefTopBar
+            isDue={isDue as boolean}
+            isSubmitted={isSubmitted as boolean}
+            onDatesChange={(startDate, endDate) => {
+              // console.log(date);
+              setStartDate(startDate);
+              setEndDate(endDate);
+            }}
+          />
+        </div>
+
         <Box
-          id="pref-form-container"
+          id="pref-mid-container"
           sx={{
             width: '100%',
-            // height: '1000px',
-            height: '100%', // !!!!
+            flexGrow: 1,
+            overflowY: 'scroll', // !!!!!
+            scrollbarWidth: 'none', // !!!
+            msOverflowStyle: 'none', // !!!!
           }}
         >
-          <Grid
-            container
-            spacing={3}
-            // sx={{ padding: '15px 30px' }}
-            padding={{ xs: '15px 10px', lg: '15px 30px' }}
+          <Box
+            id="pref-form-container"
+            sx={{
+              width: '100%',
+              // height: '1000px',
+              height: '100%', // !!!!
+            }}
           >
-            {formState?.hoursPerWeek &&
-              formState?.maxHoursPerShift &&
-              formState?.preferredWeekDays &&
-              formState?.timeOfDay &&
-              formState?.HospitalsRanking && (
-                <>
-                  <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                    <Typography>Max Hours Per Week</Typography>
-                    <Box
-                      sx={{
-                        p: '3px 20px 0 20px',
-                        borderRadius: '5px',
-                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                      }}
-                      onBlur={() => {
-                        handleFormBlur('hoursPerWeek');
-                      }}
-                      onFocus={() => {
-                        handleFormFocus('hoursPerWeek');
-                      }}
-                    >
-                      <Slider
-                        aria-label="Custom marks"
-                        value={formState?.hoursPerWeek?.content as number}
-                        onChange={(e, val) => {
-                          handleFormChange('hoursPerWeek', val);
+            <Grid
+              container
+              spacing={3}
+              // sx={{ padding: '15px 30px' }}
+              padding={{ xs: '15px 10px', lg: '15px 30px' }}
+            >
+              {formState?.hoursPerWeek &&
+                formState?.maxHoursPerShift &&
+                formState?.preferredWeekDays &&
+                formState?.timeOfDay &&
+                formState?.HospitalsRanking && (
+                  <>
+                    <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
+                      <Typography>Max Hours Per Week</Typography>
+                      <Box
+                        sx={{
+                          p: '3px 20px 0 20px',
+                          borderRadius: '5px',
+                          border: '1px solid rgba(0, 0, 0, 0.23)',
+                        }}
+                        onBlur={() => {
+                          handleFormBlur('hoursPerWeek');
+                        }}
+                        onFocus={() => {
+                          handleFormFocus('hoursPerWeek');
+                        }}
+                      >
+                        <Slider
+                          aria-label="Custom marks"
+                          value={formState?.hoursPerWeek?.content as number}
+                          onChange={(e, val) => {
+                            handleFormChange('hoursPerWeek', val);
+                          }}
+                          disabled={isDue}
+                          // getAriaValueText={valuetext}
+                          step={4}
+                          min={0}
+                          max={84}
+                          valueLabelDisplay="auto"
+                          marks={[
+                            { value: 0, label: '0' },
+                            { value: 12, label: '12h' },
+                            { value: 24, label: '24h' },
+                            { value: 36, label: '36h' },
+                            { value: 48, label: '48h' },
+                            { value: 60, label: '60h' },
+                            { value: 72, label: '72h' },
+                            { value: 84, label: '84h' },
+                          ]}
+                        />
+                      </Box>
+                      {!!formState.hoursPerWeek.errorMessage &&
+                        !!!formState.hoursPerWeek.isFocused && (
+                          <Typography color="error">
+                            {formState.hoursPerWeek.errorMessage}
+                          </Typography>
+                        )}
+                    </Grid>
+                    <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
+                      <Typography>Max Hours Per Shift</Typography>
+                      <Box
+                        sx={{
+                          p: '3px 20px 0 20px',
+                          borderRadius: '5px',
+                          border: '1px solid rgba(0, 0, 0, 0.23)',
+                        }}
+                        onBlur={() => {
+                          handleFormBlur('maxHoursPerShift');
+                        }}
+                        onFocus={() => {
+                          handleFormFocus('maxHoursPerShift');
+                        }}
+                      >
+                        <Slider
+                          aria-label="MaxHoursPerShift"
+                          value={formState.maxHoursPerShift.content as number}
+                          onChange={(e, val) => handleFormChange('maxHoursPerShift', val)}
+                          disabled={isDue}
+                          step={1}
+                          min={0}
+                          max={12}
+                          valueLabelDisplay="auto"
+                          marks={[
+                            { value: 0, label: '0' },
+                            { value: 3, label: '3h' },
+                            { value: 6, label: '6h' },
+                            { value: 9, label: '9h' },
+                            { value: 12, label: '12h' },
+                          ]}
+                        />
+                      </Box>
+                      {!!formState.maxHoursPerShift.errorMessage &&
+                        !!!formState.maxHoursPerShift.isFocused && (
+                          <Typography color="error">
+                            {formState.maxHoursPerShift.errorMessage}
+                          </Typography>
+                        )}
+                    </Grid>
+
+                    <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
+                      <Autocomplete
+                        multiple
+                        options={[
+                          'Monday',
+                          'Tuesday',
+                          'Wednesday',
+                          'Thursday',
+                          'Friday',
+                          'Saturday',
+                          'Sunday',
+                        ]}
+                        disabled={isDue}
+                        getOptionLabel={(option: string) => option}
+                        value={formState.preferredWeekDays.content as string[]}
+                        onChange={(event, newValue: string[]) => {
+                          handleFormChange('preferredWeekDays', newValue);
+                        }}
+                        renderInput={params => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            label="Select preferred weekdays"
+                            error={
+                              !!formState.preferredWeekDays?.errorMessage &&
+                              !formState.preferredWeekDays.isFocused
+                            }
+                            helperText={
+                              !!formState.preferredWeekDays?.errorMessage &&
+                              !formState.preferredWeekDays?.isFocused
+                                ? formState.preferredWeekDays?.errorMessage
+                                : ''
+                            }
+                          />
+                        )}
+                        onBlur={() => {
+                          handleFormBlur('preferredWeekDays');
+                        }}
+                        onFocus={() => {
+                          handleFormFocus('preferredWeekDays');
+                        }}
+                        disablePortal
+                        disableClearable
+                        // blurOnSelect
+                        disableCloseOnSelect
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
+                      <Autocomplete
+                        options={['morning', 'afternoon', 'night']}
+                        getOptionLabel={(option: string) => option}
+                        value={formState.timeOfDay.content as string}
+                        onChange={(event, newValue: string) => {
+                          handleFormChange('timeOfDay', newValue);
                         }}
                         disabled={isDue}
-                        // getAriaValueText={valuetext}
-                        step={4}
-                        min={0}
-                        max={84}
-                        valueLabelDisplay="auto"
-                        marks={[
-                          { value: 0, label: '0' },
-                          { value: 12, label: '12h' },
-                          { value: 24, label: '24h' },
-                          { value: 36, label: '36h' },
-                          { value: 48, label: '48h' },
-                          { value: 60, label: '60h' },
-                          { value: 72, label: '72h' },
-                          { value: 84, label: '84h' },
-                        ]}
+                        renderInput={params => (
+                          <TextField
+                            {...params}
+                            label="Select time of day"
+                            error={
+                              !!formState.timeOfDay?.errorMessage && !formState.timeOfDay.isFocused
+                            }
+                            helperText={
+                              !!formState.timeOfDay?.errorMessage && !formState.timeOfDay?.isFocused
+                                ? formState.timeOfDay?.errorMessage
+                                : ''
+                            }
+                          />
+                        )}
+                        onBlur={() => {
+                          handleFormBlur('timeOfDay');
+                        }}
+                        onFocus={() => {
+                          handleFormFocus('timeOfDay');
+                        }}
+                        disablePortal
+                        disableClearable
+                        blurOnSelect
                       />
-                    </Box>
-                    {!!formState.hoursPerWeek.errorMessage &&
-                      !!!formState.hoursPerWeek.isFocused && (
-                        <Typography color="error">{formState.hoursPerWeek.errorMessage}</Typography>
-                      )}
-                  </Grid>
-                  <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                    <Typography>Max Hours Per Shift</Typography>
-                    <Box
-                      sx={{
-                        p: '3px 20px 0 20px',
-                        borderRadius: '5px',
-                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                      }}
-                      onBlur={() => {
-                        handleFormBlur('maxHoursPerShift');
-                      }}
-                      onFocus={() => {
-                        handleFormFocus('maxHoursPerShift');
-                      }}
-                    >
-                      <Slider
-                        aria-label="MaxHoursPerShift"
-                        value={formState.maxHoursPerShift.content as number}
-                        onChange={(e, val) => handleFormChange('maxHoursPerShift', val)}
-                        disabled={isDue}
-                        step={1}
-                        min={0}
-                        max={12}
-                        valueLabelDisplay="auto"
-                        marks={[
-                          { value: 0, label: '0' },
-                          { value: 3, label: '3h' },
-                          { value: 6, label: '6h' },
-                          { value: 9, label: '9h' },
-                          { value: 12, label: '12h' },
-                        ]}
+                    </Grid>
+                    {/* ADDING initializing logic here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */}
+                    <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
+                      <HospitalsRanking
+                        disable={isDue as boolean}
+                        initRanking={
+                          (formState.HospitalsRanking?.content as number[]).length
+                            ? (formState.HospitalsRanking?.content as number[])
+                            : []
+                        }
+                        onRankingChange={newRanking => {
+                          // console.log(`receiving new ranking: ${newRanking}`);
+                          newRanking && handleFormChange('HospitalsRanking', newRanking);
+                        }}
                       />
-                    </Box>
-                    {!!formState.maxHoursPerShift.errorMessage &&
-                      !!!formState.maxHoursPerShift.isFocused && (
-                        <Typography color="error">
-                          {formState.maxHoursPerShift.errorMessage}
-                        </Typography>
-                      )}
-                  </Grid>
+                    </Grid>
+                  </>
+                )}
+            </Grid>
+          </Box>
+        </Box>
 
-                  <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                    <Autocomplete
-                      multiple
-                      options={[
-                        'Monday',
-                        'Tuesday',
-                        'Wednesday',
-                        'Thursday',
-                        'Friday',
-                        'Saturday',
-                        'Sunday',
-                      ]}
-                      disabled={isDue}
-                      getOptionLabel={(option: string) => option}
-                      value={formState.preferredWeekDays.content as string[]}
-                      onChange={(event, newValue: string[]) => {
-                        handleFormChange('preferredWeekDays', newValue);
-                      }}
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          label="Select preferred weekdays"
-                          error={
-                            !!formState.preferredWeekDays?.errorMessage &&
-                            !formState.preferredWeekDays.isFocused
-                          }
-                          helperText={
-                            !!formState.preferredWeekDays?.errorMessage &&
-                            !formState.preferredWeekDays?.isFocused
-                              ? formState.preferredWeekDays?.errorMessage
-                              : ''
-                          }
-                        />
-                      )}
-                      onBlur={() => {
-                        handleFormBlur('preferredWeekDays');
-                      }}
-                      onFocus={() => {
-                        handleFormFocus('preferredWeekDays');
-                      }}
-                      disablePortal
-                      disableClearable
-                      // blurOnSelect
-                      disableCloseOnSelect
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                    <Autocomplete
-                      options={['morning', 'afternoon', 'night']}
-                      getOptionLabel={(option: string) => option}
-                      value={formState.timeOfDay.content as string}
-                      onChange={(event, newValue: string) => {
-                        handleFormChange('timeOfDay', newValue);
-                      }}
-                      disabled={isDue}
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                          label="Select time of day"
-                          error={
-                            !!formState.timeOfDay?.errorMessage && !formState.timeOfDay.isFocused
-                          }
-                          helperText={
-                            !!formState.timeOfDay?.errorMessage && !formState.timeOfDay?.isFocused
-                              ? formState.timeOfDay?.errorMessage
-                              : ''
-                          }
-                        />
-                      )}
-                      onBlur={() => {
-                        handleFormBlur('timeOfDay');
-                      }}
-                      onFocus={() => {
-                        handleFormFocus('timeOfDay');
-                      }}
-                      disablePortal
-                      disableClearable
-                      blurOnSelect
-                    />
-                  </Grid>
-                  {/* ADDING initializing logic here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */}
-                  <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                    <HospitalsRanking
-                      disable={isDue as boolean}
-                      initRanking={
-                        (formState.HospitalsRanking?.content as number[]).length
-                          ? (formState.HospitalsRanking?.content as number[])
-                          : []
-                      }
-                      onRankingChange={newRanking => {
-                        // console.log(`receiving new ranking: ${newRanking}`);
-                        newRanking && handleFormChange('HospitalsRanking', newRanking);
-                      }}
-                    />
-                  </Grid>
-                </>
-              )}
-          </Grid>
+        <Box
+          id="pref-bottom-container"
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 3,
+            p: '15px',
+            height: '70px',
+            borderTop: 'solid 1px #475862',
+          }}
+        >
+          {/* <Typography>{isDue ? 'isDue' : 'OK'}</Typography> */}
+          <Button disabled={isDue} onClick={handleOpenTemplate} variant="outlined" color="inherit">
+            {`Use Preference template`}
+          </Button>
+          <Button
+            disabled={isDue}
+            onClick={() => {
+              isSubmitted ? handlePrefUpdate() : handlePrefSubmit();
+            }}
+            variant="contained"
+            color="primary"
+          >
+            {isDue ? 'Not submittable' : isSubmitted ? 'Update' : 'Submit'}
+          </Button>
+          {/* <Typography>{isSubmitted ? 'submitted' : 'not submitted'}</Typography> */}
         </Box>
       </Box>
-
-      <Box
-        id="pref-bottom-container"
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 3,
-          p: '15px',
-          height: '70px',
-          borderTop: 'solid 1px #475862',
-        }}
-      >
-        <Typography>{isDue ? 'isDue' : 'OK'}</Typography>
-        <Button
-          disabled={isDue}
-          onClick={() => {
-            isSubmitted ? handlePrefUpdate() : handlePrefSubmit();
-          }}
-          variant="outlined"
-          color="inherit"
-        >
-          {isDue ? 'Not submittable' : isSubmitted ? 'Update' : 'Submit'}
-        </Button>
-        <Typography>{isSubmitted ? 'submitted' : 'not submitted'}</Typography>
-      </Box>
-    </Box>
+    </>
   );
 }

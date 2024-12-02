@@ -18,7 +18,8 @@ export default function PrefTemplateManagement() {
         flexDirection: 'column',
         justifyContent: 'start',
         p: '10px 7px 3px 5px',
-        backgroundColor: 'gray',
+        // backgroundColor: 'gray',
+        backgroundColor: '#f9f9f9',
       }}
     >
       {sliceNurseId && <PrefTemplateList nurseId={sliceNurseId} />}

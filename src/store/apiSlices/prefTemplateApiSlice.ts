@@ -41,6 +41,35 @@ interface FetchPrefTemplateListArgs {
   page_size?: number;
 }
 
+interface UpdatePrefTemplateRes {
+  msg: string;
+}
+
+export interface UpdatePrefTemplateArgs {
+  template_id: number;
+  template_name?: string;
+  max_hours_per_shift?: number;
+  hours_per_week?: number;
+  time_of_day?: string;
+  preferred_week_days?: string[];
+  hospitals_ranking?: string[];
+}
+
+interface CreatePrefTemplateRes {
+  msg: string;
+  template_name: string;
+}
+
+export type CreatePrefTemplateArgs = {
+  nurse_id: number;
+  template_name: string;
+  max_hours_per_shift: number;
+  hours_per_week: number;
+  time_of_day: string;
+  preferred_week_days: string[];
+  hospitals_ranking: string[];
+};
+
 export const prefTemplateApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     fetchPrefTemplateList: builder.query<FetchPrefTemplateListRes, FetchPrefTemplateListArgs>({
@@ -66,10 +95,40 @@ export const prefTemplateApiSlice = apiSlice.injectEndpoints({
             hospitals_ranking: JSON.parse(template.hospitals_ranking || '[]'),
           };
         });
-
         return { ...res.data, template_list: parsedTemplateList };
       },
+      providesTags(res) {
+        if (!res || !res.template_list) return [];
+
+        let tagList: { type: 'PrefTemplate'; id: number }[] = [];
+        res.template_list.forEach(templateObj => {
+          tagList.push({ type: 'PrefTemplate', id: templateObj.template_id });
+        });
+        return tagList;
+      },
+    }),
+    updatePrefTemplate: builder.mutation<UpdatePrefTemplateRes, UpdatePrefTemplateArgs>({
+      query: ({ template_id, ...payload }) => ({
+        url: `preference-template/update-template?template_id=${encodeURIComponent(template_id)}`,
+        method: 'PUT',
+        body: payload,
+      }),
+      invalidatesTags(result, error, args, meta) {
+        return [{ type: 'PrefTemplate', id: args.template_id }];
+      },
+    }),
+    createPrefTemplate: builder.mutation<CreatePrefTemplateRes, CreatePrefTemplateArgs>({
+      query: payload => ({
+        url: `preference-template/create-template`,
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: [{ type: 'PrefTemplate' }],
     }),
   }),
 });
-export const { useFetchPrefTemplateListQuery } = prefTemplateApiSlice;
+export const {
+  useFetchPrefTemplateListQuery,
+  useUpdatePrefTemplateMutation,
+  useCreatePrefTemplateMutation,
+} = prefTemplateApiSlice;

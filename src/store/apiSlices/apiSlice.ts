@@ -96,7 +96,7 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['User', 'Preference', 'Request'],
+  tagTypes: ['User', 'Preference', 'Request', 'PrefTemplate'],
   endpoints: builder => ({
     demoRequest: builder.query({
       query: () => ({

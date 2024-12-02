@@ -28,6 +28,7 @@ export default function HospitalsRanking({
       const defaultRanking = hospitalsData.data.map(hospital => hospital.h_id);
       // console.log(`!!!!!! init with default`, defaultRanking);
       setHospitalsRanking(defaultRanking);
+      onRankingChange(defaultRanking);
     }
   }, [initRanking, hospitalsData]); // isEqual checks for deep equality
 

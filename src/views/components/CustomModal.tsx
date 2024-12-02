@@ -8,7 +8,9 @@ type CustomModalProps = {
   children: React.ReactNode;
   onSubmit?: () => void;
   showSubmitBtn?: boolean;
+  submitBtnText?: string;
   disableSubmitBtn?: boolean;
+  fixedContentHeight?: number;
 };
 
 export default function CustomModal({
@@ -18,7 +20,9 @@ export default function CustomModal({
   onClose,
   onSubmit,
   showSubmitBtn = true,
+  submitBtnText = 'Submit',
   disableSubmitBtn = false,
+  fixedContentHeight = 0,
 }: CustomModalProps) {
   return (
     <Modal
@@ -78,6 +82,7 @@ export default function CustomModal({
             scrollbarWidth: 'none', // hides the scrollbar on Firefox
             msOverflowStyle: 'none', // hides scrollbar on IE and Edge
           }}
+          height={!!fixedContentHeight ? `${fixedContentHeight}px` : 'auto'}
         >
           {children}
         </Box>
@@ -102,7 +107,7 @@ export default function CustomModal({
               variant="contained"
               color="primary"
             >
-              Submit
+              {submitBtnText}
             </Button>
           )}
         </Box>
