@@ -163,6 +163,7 @@ export default function UserManagement() {
             fetchedUsersData.user_list.map((userObject, index) => {
               return (
                 <Accordion
+                  // expanded={}
                   key={index}
                   sx={{
                     // border: '1px solid #000',

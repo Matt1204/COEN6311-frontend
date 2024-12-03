@@ -25,8 +25,8 @@ export default function TopNav_r() {
   const handleLogout = async () => {
     try {
       await triggerLogout().unwrap();
+      navigate('/auth', { state: { forcedLogOut: false, msg: 'from user logout' } });
       dispatch(removeUser());
-      navigate('/auth');
     } catch (error) {
       console.error('Logout error:', error);
     }

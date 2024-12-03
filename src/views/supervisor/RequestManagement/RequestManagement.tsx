@@ -1,7 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { useState, useEffect, useMemo } from 'react';
 
-import WeekSelector from './components/WeekSelector';
 import ReqTopBar from './components/ReqTopBar';
 import {
   useFetchReqListQuery,

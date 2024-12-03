@@ -123,8 +123,8 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
           }}
         >
           <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
-            <NavItem title={'home'} toURL={'/'} />
             {navItems}
+            <NavItem title={'home(debugging)'} toURL={'/home'} />
           </Stack>
         </Box>
       </Stack>

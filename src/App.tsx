@@ -75,12 +75,14 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route element={<PersistLogin />}>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['home']} />}>
-              <Route index element={<Home />} />
+              {/* <Route index element={<Home />} /> */}
+              <Route path="/home" element={<Home />} />
             </Route>
 
             {/* Routes for Nurses */}
             <Route element={<RequireAuth allowedRoles={routeRolesMap['my-schedule']} />}>
               <Route path="my-schedule" element={<NurseSchedule />} />
+              {/* <Route element={<NurseSchedule />} /> */}
             </Route>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['pref-management']} />}>
               <Route path="pref-management" element={<PreferenceManagement />} />
@@ -92,6 +94,7 @@ function App() {
             {/* Routes for Supervisors */}
             <Route element={<RequireAuth allowedRoles={routeRolesMap['hospital-schedule']} />}>
               <Route path="hospital-schedule" element={<HospitalSchedule />} />
+              {/* <Route index element={<HospitalSchedule />} /> */}
             </Route>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['req-management']} />}>
               <Route path="req-management" element={<RequestManagement />} />
@@ -99,9 +102,10 @@ function App() {
             <Route element={<RequireAuth allowedRoles={routeRolesMap['hospital-template']} />}>
               <Route path="hospital-template" element={<HospitalTemplate />} />
             </Route>
-
+            {/* Routes for Admin */}
             <Route element={<RequireAuth allowedRoles={routeRolesMap['user-management']} />}>
               <Route path="user-management" element={<UserManagement />} />
+              {/* <Route index path="user-management" element={<UserManagement />} /> */}
             </Route>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['schedule-management']} />}>
               <Route path="schedule-management" element={<ScheduleManagement />} />

@@ -55,7 +55,6 @@ export const preferenceApiSlice = apiSlice.injectEndpoints({
         url: `preference/get-preference?nurse_id=${encodeURIComponent(nurseId)}&start_date=${startDate}`,
         method: 'GET',
       }),
-
       transformResponse: (response: any, meta, arg) => {
         if (Object.keys(response.data).length === 0) {
           return {
@@ -85,8 +84,9 @@ export const preferenceApiSlice = apiSlice.injectEndpoints({
           };
         }
       },
-      providesTags: (result, error, arg) =>
-        result ? [{ type: 'Preference', id: arg.startDate }] : [],
+      providesTags: (result, error, arg) => {
+        return [{ type: 'Preference', id: arg.startDate }];
+      },
     }),
     updatePreference: builder.mutation<updatePreferenceRes, updatePreferenceData>({
       query: ({ nurse_id, start_date, ...reqBody }) => ({
@@ -94,8 +94,9 @@ export const preferenceApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: reqBody,
       }),
-      invalidatesTags: (result, error, args) => [{ type: 'Preference', id: args.start_date }],
-      // invalidatesTags: [{ type: 'Preference', id: start_date }],
+      invalidatesTags: (result, error, args) => {
+        return [{ type: 'Preference', id: args.start_date }];
+      },
     }),
     createPreference: builder.mutation<CreatePreferenceRes, CreatePreferenceData>({
       query: data => ({

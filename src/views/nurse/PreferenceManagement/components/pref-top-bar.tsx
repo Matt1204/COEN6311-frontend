@@ -8,39 +8,21 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from 'dayjs';
 
+import { getNextDayToSubmit, getWeekBounds } from '../../../../shared/utils/weekMethods';
+
 interface PrefTopBarProps {
   isDue: boolean;
   isSubmitted: boolean;
   onDatesChange: (startDate: Dayjs, endDate: Dayjs) => void; // Callback function to update the parent component
 }
 
-function getWeekBounds(date: dayjs.Dayjs): { monday: dayjs.Dayjs; sunday: dayjs.Dayjs } {
-  // Calculate the difference to Monday (1 - day()) where Monday is 1 and Sunday is 0
-  const diffToMonday = date.day() === 0 ? -6 : 1 - date.day();
-  const monday = date.add(diffToMonday, 'day');
-
-  // Sunday is always 6 days after Monday
-  const sunday = monday.add(6, 'days');
-
-  return { monday, sunday };
-}
-
 const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChange }) => {
-  function getNextWeekToSubmit(): dayjs.Dayjs {
-    console.log('HIT.............');
-
-    const today = dayjs();
-    const dayOfWeek = today.day(); // day() returns the day of the week where Sunday is 0 and Saturday is 6
-    const daysUntilNextMonday = (dayOfWeek === 0 ? 1 : 8 - dayOfWeek) % 7;
-    return today.add(daysUntilNextMonday + 7, 'day');
-  }
-
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   useEffect(() => {
-    var initialStartDate = getNextWeekToSubmit();
+    var initialStartDate = getNextDayToSubmit();
     setSelectedDate(initialStartDate); // Update the selected date if initial start date prop changes
     const { monday, sunday } = getWeekBounds(initialStartDate);
     setStartDate(monday);

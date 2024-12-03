@@ -75,17 +75,3 @@ const Layout = () => {
 };
 
 export default Layout;
-{
-  /* <Container
-              maxWidth="xl"
-              sx={{
-                flexGrow: 1, // Ensure container grows to fill space
-                padding: '4px', // Padding for top and bottom
-                // backgroundColor: 'grey', // Background color of container
-                // minHeight: 'calc(100vh - 64px)', // Ensure minimum height occupies full view minus top nav
-              }}
-              id="content-container"
-            >
-              
-            </Container> */
-}

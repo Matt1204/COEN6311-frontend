@@ -28,6 +28,7 @@ import {
 import { showAlert } from '../../../store/alertSlice';
 import TemplateSelectionModal from './components/TemplateSelectionModal';
 import { PrefTemplateInputs } from '../NurseTemplateManagement/components/PrefTemplateForm';
+import { getNextDayToSubmit } from '../../../shared/utils/weekMethods';
 
 let formSchema = z.object({
   hoursPerWeek: z
@@ -59,22 +60,27 @@ export default function PreferenceManagement() {
     {
       skip: !startDate, // Only run the query if startDate is defined
       refetchOnMountOrArgChange: true,
+      // refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
     }
   );
-  // useEffect(() => {
-  //   fetchPrefData && console.log('fetchPrefData: ', fetchPrefData);
-  // }, [fetchPrefData]);
+  useEffect(() => {
+    console.log('!!!!fetchPrefData: ', fetchPrefData);
+  }, [fetchPrefData]);
 
   // calculate if current week is due(isDue => not editable, !isDue => editable)
   const isDue = useMemo(() => {
     if (startDate) {
       const today = dayjs();
       const dayOfWeek = today.day();
-      const daysSinceMonday = (dayOfWeek + 6) % 7; // Adjust to make Monday (1) the start of the week, thus Monday will be 0
+      const daysSinceMonday = (dayOfWeek + 6) % 7;
       const currentMonday = today.subtract(daysSinceMonday, 'day');
       const twoWeeksFromMonday = currentMonday.add(13, 'day');
+      const dueDate = getNextDayToSubmit().subtract(1, 'day');
       // return twoWeeksFromMonday.isBefore(startDate);
-      return startDate.isBefore(twoWeeksFromMonday);
+      // return startDate.isBefore(twoWeeksFromMonday);
+      return startDate.isBefore(dueDate);
     }
   }, [startDate]);
 
@@ -100,7 +106,17 @@ export default function PreferenceManagement() {
 
   // initialize formState
   useEffect(() => {
+    console.log('Initialize !!!!!!!!!!');
+
     if (fetchPrefData) {
+      removeInputs([
+        'hoursPerWeek',
+        'maxHoursPerShift',
+        'preferredWeekDays',
+        'timeOfDay',
+        'HospitalsRanking',
+      ]);
+
       let dataList: {
         field: keyof typeof formSchema.shape;
         value: string | number | string[] | number[];
@@ -203,6 +219,8 @@ export default function PreferenceManagement() {
       } catch (error: any) {
         dispatch(showAlert({ msg: 'preference form invalid.', severity: 'error' }));
       }
+    } else {
+      dispatch(showAlert({ msg: 'preference form invalid.', severity: 'error' }));
     }
   };
 
@@ -274,7 +292,7 @@ export default function PreferenceManagement() {
                 formState?.HospitalsRanking && (
                   <>
                     <Grid size={{ xs: 12, lg: 6 }} padding={{ xs: '10px', md: '0px' }}>
-                      <Typography>Max Hours Per Week</Typography>
+                      <Typography>Hours Per Week</Typography>
                       <Box
                         sx={{
                           p: '3px 20px 0 20px',

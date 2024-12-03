@@ -12,13 +12,7 @@ import {
 } from '../../../store/apiSlices/nurScheduleApiSlice';
 import NurseTimetable from './components/NurseTimetable';
 import { fetchReqListRes } from '../../../store/apiSlices/requestApiSlice';
-
-function getThisMonday(): dayjs.Dayjs {
-  const today = dayjs();
-  const dayOfWeek = today.day();
-  const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  return today.add(daysToMonday, 'day').startOf('day');
-}
+import { getThisMonday } from '../../../shared/utils/weekMethods';
 
 export interface ArrangedNurShiftList {
   [key: string]: NurseShift[];

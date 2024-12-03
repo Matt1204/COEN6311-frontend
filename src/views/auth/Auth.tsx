@@ -44,15 +44,21 @@ type FormState = Record<string, Input>;
 export default function Auth() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  // const location = useLocation();
+  // const forcedLogOut = location.state?.from?.pathname || '/';
+
+  // useEffect(() => {
+  //   console.log(location.state);
+
+  //   console.log(location.state.forcedLogOut);
+
+  //   if (location?.state?.forcedLogOut) {
+  //     dispatch(showAlert({ msg: `Your session is out.` }));
+  //   }
+  // }, []);
+
   const [login] = useLoginMutation();
   const [register] = useRegisterMutation();
-  useEffect(() => {
-    if (from !== '/') {
-      dispatch(showAlert({ msg: `Your session is out.` }));
-    }
-  }, []);
   const {
     data: hospitalsData,
     error: fetchHospitalsErr,
@@ -133,7 +139,14 @@ export default function Auth() {
             })
           );
           dispatch(showAlert({ msg: `Hello ${res.first_name}`, severity: 'success' }));
-          navigate(from, { replace: true });
+          let directTo =
+            res.role == 'nurse'
+              ? '/my-schedule'
+              : res.role == 'supervisor'
+                ? '/hospital-schedule'
+                : '/user-management';
+          navigate(directTo ? directTo : '/home', { replace: true });
+          // navigate('/', { replace: true });
         } catch (err: any) {
           console.log(err);
           dispatch(showAlert({ msg: err.data.message, severity: 'error' }));
@@ -162,7 +175,7 @@ export default function Auth() {
           };
 
           let res = await register(reqPayload).unwrap();
-          console.log(res.data);
+          // console.log(res.data);
           dispatch(showAlert({ msg: `${res.email} registered`, severity: 'success' }));
           handleToLogin();
         } catch (err: any) {
@@ -372,7 +385,7 @@ export default function Auth() {
                         onChange={e => {
                           if (e.target.value) {
                             handleRoleChange(e.target.value as string);
-                            console.log(`role change: ${e.target.value}`);
+                            // console.log(`role change: ${e.target.value}`);
                           }
                         }}
                       >

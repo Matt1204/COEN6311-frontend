@@ -5,24 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Box, Typography, TextField } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-
-function getNextWeekToSubmit(): dayjs.Dayjs {
-  const today = dayjs();
-  const dayOfWeek = today.day(); // day() returns the day of the week where Sunday is 0 and Saturday is 6
-  const daysUntilNextMonday = (dayOfWeek === 0 ? 1 : 8 - dayOfWeek) % 7;
-  return today.add(daysUntilNextMonday + 7, 'day');
-}
-
-function getWeekBounds(date: dayjs.Dayjs): { monday: dayjs.Dayjs; sunday: dayjs.Dayjs } {
-  // Calculate the difference to Monday (1 - day()) where Monday is 1 and Sunday is 0
-  const diffToMonday = date.day() === 0 ? -6 : 1 - date.day();
-  const monday = date.add(diffToMonday, 'day');
-
-  // Sunday is always 6 days after Monday
-  const sunday = monday.add(6, 'days');
-
-  return { monday, sunday };
-}
+import { getWeekBounds } from '../../../../shared/utils/weekMethods';
 
 interface WeekSelectorProps {
   initDate: Dayjs;

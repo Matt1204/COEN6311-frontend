@@ -18,13 +18,7 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../../store/storeHooks';
 import { showAlert } from '../../../../store/alertSlice';
 import { useFetchReqQuery } from '../../../../store/apiSlices/requestApiSlice';
-
-function getNextWeekToSubmit(): dayjs.Dayjs {
-  const today = dayjs();
-  const dayOfWeek = today.day(); // day() returns the day of the week where Sunday is 0 and Saturday is 6
-  const daysUntilNextMonday = (dayOfWeek === 0 ? 1 : 8 - dayOfWeek) % 7;
-  return today.add(daysUntilNextMonday + 7, 'day');
-}
+import { getNextDayToSubmit } from '../../../../shared/utils/weekMethods';
 
 interface RequestModalProps {
   visible: boolean;
@@ -82,7 +76,7 @@ export default function RequestModal({
       dataList = [
         {
           field: 'shiftDate' as keyof typeof formSchema.shape,
-          value: getNextWeekToSubmit().format('YYYY-MM-DD'),
+          value: getNextDayToSubmit().format('YYYY-MM-DD'),
         },
         { field: 'minSeniority' as keyof typeof formSchema.shape, value: 5 },
         { field: 'shiftType' as keyof typeof formSchema.shape, value: 'morning' },
@@ -214,7 +208,7 @@ export default function RequestModal({
                           newDate && handleFormChange('shiftDate', newDate.format('YYYY-MM-DD'));
                         }}
                         shouldDisableDate={date => {
-                          return date && editMode && date.isBefore(getNextWeekToSubmit(), 'day');
+                          return date && editMode && date.isBefore(getNextDayToSubmit(), 'day');
                         }}
                         sx={{ width: '100%' }}
                         readOnly={!editMode}
