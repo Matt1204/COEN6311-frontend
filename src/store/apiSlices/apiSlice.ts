@@ -24,6 +24,14 @@ interface RefreshResponse {
   };
 }
 
+interface GenerateScheduleDemoArgs {
+  start_date: string;
+}
+
+interface GenerateScheduleDemoRes {
+  message: string;
+}
+
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://127.0.0.1:5000/',
   credentials: 'include', // Ensures cookies are sent along with requests if needed
@@ -110,7 +118,14 @@ export const apiSlice = createApi({
         method: 'GET',
       }),
     }),
+    generateScheduleDemo: builder.mutation<GenerateScheduleDemoRes, GenerateScheduleDemoArgs>({
+      query: payload => ({
+        url: 'generate-schedule',
+        body: payload,
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
-export const { useDemoRequestQuery } = apiSlice;
+export const { useDemoRequestQuery, useGenerateScheduleDemoMutation } = apiSlice;

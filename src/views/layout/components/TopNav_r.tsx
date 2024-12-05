@@ -53,6 +53,7 @@ export default function TopNav_r() {
             height: 40, // match Avatar size
             border: '1px solid', // border style
             borderColor: 'var(--SideNav-background)', // border color
+            display: 'none', // !!!!!!!!!!!!!!!!!!!!!!!!
           }}
         >
           <MessageIcon />

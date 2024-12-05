@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 import NurSchedulePanel from './components/NurSchedulePanel';
 import HosSchedulePabel from './components/HosSchedulePanel';
@@ -12,11 +13,24 @@ function a11yProps(index: number) {
 }
 
 export default function ScheduleManagement() {
+  const location = useLocation();
+  const routeState = location.state;
+  // console.log('routeState: ', routeState);
+
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    console.log('routeState:', routeState);
+    if (routeState) {
+      if (routeState.type == 'supervisor') {
+        setTabValue(1);
+      }
+    }
+  }, []);
 
   return (
     <Box
@@ -38,7 +52,10 @@ export default function ScheduleManagement() {
       </Box>
       <Box id="tabContentContainer" sx={{ flexGrow: 1, width: '100%', display: 'flex' }}>
         <Box sx={{ display: tabValue === 0 ? 'flex' : 'none', height: '100%', width: '100%' }}>
-          <NurSchedulePanel />
+          <NurSchedulePanel
+            initUserId={routeState && routeState.type == 'nurse' ? routeState.payload : null}
+          />
+          {/* <NurSchedulePanel /> */}
         </Box>
         <Box
           sx={{
@@ -48,7 +65,11 @@ export default function ScheduleManagement() {
             // backgroundColor: 'blue',
           }}
         >
-          <HosSchedulePabel />
+          <HosSchedulePabel
+            initHospitalId={
+              routeState && routeState.type == 'supervisor' ? routeState.payload : null
+            }
+          />
         </Box>
       </Box>
     </Box>

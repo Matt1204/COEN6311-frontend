@@ -16,6 +16,7 @@ import PrefTemplateManagement from './views/nurse/NurseTemplateManagement/PrefTe
 import HospitalSchedule from './views/supervisor/HosipitalSchedule/HosipitalSchedule';
 import HospitalTemplate from './views/supervisor/HospitalTemplate/HospitalTemplate';
 import ScheduleManagement from './views/admin/ScheduleManagement/ScheduleManagement';
+import GenerateScheduleDemo from './views/admin/GenerateScheduleDemo';
 import { Snackbar, Alert } from '@mui/material';
 
 import './App.css';
@@ -33,6 +34,7 @@ const routeRolesMap = {
   'hospital-template': ['supervisor'],
   'user-management': ['admin'],
   'schedule-management': ['admin'],
+  'generate-schedule': ['admin'],
 };
 
 function App() {
@@ -56,7 +58,7 @@ function App() {
           severity={alertState.severity}
           sx={{
             width: '100%',
-            maxWidth: 400, // Fixed width for the Snackbar
+            maxWidth: 800, // Fixed width for the Snackbar
             '& .MuiAlert-message': {
               overflow: 'hidden',
               whiteSpace: 'nowrap',
@@ -109,6 +111,9 @@ function App() {
             </Route>
             <Route element={<RequireAuth allowedRoles={routeRolesMap['schedule-management']} />}>
               <Route path="schedule-management" element={<ScheduleManagement />} />
+            </Route>
+            <Route element={<RequireAuth allowedRoles={routeRolesMap['generate-schedule']} />}>
+              <Route path="generate-schedule" element={<GenerateScheduleDemo />} />
             </Route>
 
             <Route path="/unauthorized" element={<Unauthorized />} />

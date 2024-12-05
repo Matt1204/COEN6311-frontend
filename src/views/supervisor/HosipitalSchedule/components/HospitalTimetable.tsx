@@ -255,130 +255,141 @@ const HospitalTimetable: React.FC<HospitalTimetableProps> = ({ fetchedHosShifts 
                               msOverflowStyle: 'none', // !!!!
                             }}
                           >
-                            {timeOfDayList.map((shiftObject, shiftObjectIdx) => {
-                              return (
-                                <Box key={shiftObjectIdx}>
-                                  <Box
-                                    id={`reqObjContainer-${shiftObjectIdx}`}
-                                    sx={{
-                                      marginBottom: '15px',
-                                      '&:hover': {
-                                        boxShadow: '8px 8px 20px rgba(0, 0, 0, 0.2)',
-                                      },
-                                      cursor: 'pointer',
-                                    }}
-                                    onClick={e => {
-                                      handleItemClick(e, shiftObject.request_id);
-                                    }}
-                                  >
-                                    <Paper
+                            {timeOfDayList.length ? (
+                              timeOfDayList.map((shiftObject, shiftObjectIdx) => {
+                                return (
+                                  <Box key={shiftObjectIdx}>
+                                    <Box
+                                      id={`reqObjContainer-${shiftObjectIdx}`}
                                       sx={{
-                                        width: '100%',
-                                        backgroundColor: '#fcfcfa',
-                                        border: '1px  solid #000',
-                                        p: '4px 0',
+                                        marginBottom: '15px',
+                                        '&:hover': {
+                                          boxShadow: '8px 8px 20px rgba(0, 0, 0, 0.2)',
+                                        },
+                                        cursor: 'pointer',
                                       }}
-                                      elevation={4}
+                                      onClick={e => {
+                                        handleItemClick(e, shiftObject.request_id);
+                                      }}
                                     >
-                                      <Box
+                                      <Paper
                                         sx={{
                                           width: '100%',
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          p: '4px 4px',
+                                          backgroundColor: '#fcfcfa',
+                                          border: '1px  solid #000',
+                                          p: '4px 0',
                                         }}
+                                        elevation={4}
                                       >
-                                        <Chip
-                                          sx={{ marginBottom: '1px' }}
-                                          label={` ${shiftObject.actual_nurse_num}/${shiftObject.request_nurse_num} nurses`}
-                                          icon={<Groups3TwoToneIcon />}
-                                          size="small"
-                                          color="primary"
-                                          variant="outlined"
-                                        />
-                                        <Chip
-                                          sx={{ marginBottom: '1px' }}
-                                          label={`${shiftObject.hours_per_shift} hours`}
-                                          // onClick={handleClick}
-                                          // onDelete={handleDelete}
-                                          icon={<ScheduleTwoToneIcon />}
-                                          size="small"
-                                          color="primary"
-                                          variant="outlined"
-                                        />
-                                        <Chip
-                                          sx={{ marginBottom: '1px' }}
-                                          label={`seniority ${shiftObject.min_seniority}`}
-                                          // onClick={handleClick}
-                                          // onDelete={handleDelete}
-                                          icon={<SchoolTwoToneIcon />}
-                                          size="small"
-                                          color="primary"
-                                          variant="outlined"
-                                        />
-                                        <Chip
+                                        <Box
                                           sx={{
-                                            marginBottom: '1px',
-                                            height: 'auto', // Allow the height to adjust automatically
-                                            whiteSpace: 'normal', // Allow text to wrap to multiple lines
-                                            wordWrap: 'break-word', // Ensure long words break properly
-                                            // padding: '4px', // Add padding for better spacing
+                                            width: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            p: '4px 4px',
                                           }}
-                                          label={`posted by ${shiftObject.supervisor_email}`}
-                                          // onClick={handleClick}
-                                          // onDelete={handleDelete}
-                                          // icon={<SchoolTwoToneIcon />}
-                                          size="small"
-                                          color="primary"
-                                          variant="outlined"
-                                        />
-                                      </Box>
-                                    </Paper>
-                                  </Box>
-                                  <Menu
-                                    id="basic-menu"
-                                    anchorEl={anchorEl}
-                                    // open={Boolean(anchorEl)}
-                                    open={!!anchorEl}
-                                    onClose={handleMenuClose}
-                                    MenuListProps={{
-                                      'aria-labelledby': 'basic-button',
-                                    }}
-                                    sx={{
-                                      '& .MuiPaper-root': {
-                                        backgroundColor: '#ffffff',
-                                        boxShadow: '0px 2px 3px rgba(0,0,0,0.05)',
-                                        borderRadius: 4,
-                                        minWidth: 150,
-                                        border: '1px solid #b0b0af',
-                                      },
-                                    }}
-                                    anchorOrigin={{
-                                      vertical: 'bottom',
-                                      horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                      vertical: 'top',
-                                      horizontal: 'right',
-                                    }}
-                                  >
-                                    <MenuItem
-                                      onClick={() => {
-                                        setAnchorEl(null);
-                                        // onViewItem(clcikedItemId as number);
-                                        handleViewShift(clcikedItemId as number);
+                                        >
+                                          <Chip
+                                            sx={{ marginBottom: '1px' }}
+                                            label={` ${shiftObject.actual_nurse_num}/${shiftObject.request_nurse_num} nurses`}
+                                            icon={<Groups3TwoToneIcon />}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                          />
+                                          <Chip
+                                            sx={{ marginBottom: '1px' }}
+                                            label={`${shiftObject.hours_per_shift} hours`}
+                                            // onClick={handleClick}
+                                            // onDelete={handleDelete}
+                                            icon={<ScheduleTwoToneIcon />}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                          />
+                                          <Chip
+                                            sx={{ marginBottom: '1px' }}
+                                            label={`seniority ${shiftObject.min_seniority}`}
+                                            // onClick={handleClick}
+                                            // onDelete={handleDelete}
+                                            icon={<SchoolTwoToneIcon />}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                          />
+                                          <Chip
+                                            sx={{
+                                              marginBottom: '1px',
+                                              height: 'auto', // Allow the height to adjust automatically
+                                              whiteSpace: 'normal', // Allow text to wrap to multiple lines
+                                              wordWrap: 'break-word', // Ensure long words break properly
+                                              // padding: '4px', // Add padding for better spacing
+                                            }}
+                                            label={`posted by ${shiftObject.supervisor_email}`}
+                                            // onClick={handleClick}
+                                            // onDelete={handleDelete}
+                                            // icon={<SchoolTwoToneIcon />}
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                          />
+                                        </Box>
+                                      </Paper>
+                                    </Box>
+                                    <Menu
+                                      id="basic-menu"
+                                      anchorEl={anchorEl}
+                                      // open={Boolean(anchorEl)}
+                                      open={!!anchorEl}
+                                      onClose={handleMenuClose}
+                                      MenuListProps={{
+                                        'aria-labelledby': 'basic-button',
+                                      }}
+                                      sx={{
+                                        '& .MuiPaper-root': {
+                                          backgroundColor: '#ffffff',
+                                          boxShadow: '0px 2px 3px rgba(0,0,0,0.05)',
+                                          borderRadius: 4,
+                                          minWidth: 150,
+                                          border: '1px solid #b0b0af',
+                                        },
+                                      }}
+                                      anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                      }}
+                                      transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
                                       }}
                                     >
-                                      <ListItemIcon>
-                                        <SavedSearchIcon fontSize="small" />
-                                      </ListItemIcon>
-                                      <ListItemText>Detail</ListItemText>
-                                    </MenuItem>
-                                    <Divider />
-                                  </Menu>
-                                </Box>
-                              );
-                            })}
+                                      <MenuItem
+                                        onClick={() => {
+                                          setAnchorEl(null);
+                                          // onViewItem(clcikedItemId as number);
+                                          handleViewShift(clcikedItemId as number);
+                                        }}
+                                      >
+                                        <ListItemIcon>
+                                          <SavedSearchIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText>Detail</ListItemText>
+                                      </MenuItem>
+                                      <Divider />
+                                    </Menu>
+                                  </Box>
+                                );
+                              })
+                            ) : (
+                              <Chip
+                                label={`No Shift`}
+                                sx={{ marginBottom: '5px' }}
+                                //   icon={<Groups3TwoToneIcon />}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                              />
+                            )}
                           </Box>
                         );
                       })}

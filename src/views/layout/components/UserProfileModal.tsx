@@ -48,7 +48,7 @@ export default function UserProfileModal({ visibility = false, onCloseModal }: U
   } = useFetchAllHospitalsQuery(undefined, { skip: !(userState.role == 'supervisor') });
 
   // fetch User information
-  const { data: userData, refetch: refetchUser } = useFetchUserQuery(userState.email, {
+  const { data: userData, refetch: refetchUser } = useFetchUserQuery(userState.uId, {
     refetchOnMountOrArgChange: true,
   });
 

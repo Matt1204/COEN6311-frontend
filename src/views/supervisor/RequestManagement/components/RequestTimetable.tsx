@@ -213,144 +213,155 @@ const RequestTimetable: React.FC<RequestTimetableProps> = ({
                         msOverflowStyle: 'none', // !!!!
                       }}
                     >
-                      {timeOfDayList.map((reqObj, reqObjIdx) => {
-                        return (
-                          <Box key={reqObjIdx}>
-                            <Box
-                              id={`reqObjContainer-${reqObjIdx}`}
-                              sx={{
-                                marginBottom: '15px',
-                                '&:hover': {
-                                  boxShadow: '8px 8px 20px rgba(0, 0, 0, 0.2)',
-                                },
-                                cursor: 'pointer',
-                              }}
-                              onClick={e => {
-                                handleItemClick(e, reqObj.request_id);
-                              }}
-                              // onClick={handleItemClick}
-                            >
-                              <Paper
+                      {timeOfDayList.length ? (
+                        timeOfDayList.map((reqObj, reqObjIdx) => {
+                          return (
+                            <Box key={reqObjIdx}>
+                              <Box
+                                id={`reqObjContainer-${reqObjIdx}`}
                                 sx={{
-                                  width: '100%',
-                                  backgroundColor: '#fcfcfa',
-                                  // backgroundColor: 'grey',
-
-                                  border: '1px  solid #000', // border style
-                                  p: '4px 0',
+                                  marginBottom: '15px',
+                                  '&:hover': {
+                                    boxShadow: '8px 8px 20px rgba(0, 0, 0, 0.2)',
+                                  },
+                                  cursor: 'pointer',
                                 }}
-                                elevation={4}
+                                onClick={e => {
+                                  handleItemClick(e, reqObj.request_id);
+                                }}
+                                // onClick={handleItemClick}
                               >
-                                <Box
+                                <Paper
                                   sx={{
                                     width: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    p: '4px 4px',
+                                    backgroundColor: '#fcfcfa',
+                                    // backgroundColor: 'grey',
+
+                                    border: '1px  solid #000', // border style
+                                    p: '4px 0',
+                                  }}
+                                  elevation={4}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: '100%',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      p: '4px 4px',
+                                    }}
+                                  >
+                                    <Chip
+                                      sx={{ marginBottom: '1px' }}
+                                      label={`${reqObj.nurse_number} nurses`}
+                                      // onClick={handleClick}
+                                      // onDelete={handleDelete}
+                                      icon={<Groups3TwoToneIcon />}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                    />
+                                    <Chip
+                                      sx={{ marginBottom: '1px' }}
+                                      label={`${reqObj.hours_per_shift} hours`}
+                                      // onClick={handleClick}
+                                      // onDelete={handleDelete}
+                                      icon={<ScheduleTwoToneIcon />}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                    />
+                                    <Chip
+                                      sx={{ marginBottom: '1px' }}
+                                      label={`seniority ${reqObj.min_seniority}`}
+                                      // onClick={handleClick}
+                                      // onDelete={handleDelete}
+                                      icon={<SchoolTwoToneIcon />}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                    />
+                                  </Box>
+                                </Paper>
+                              </Box>
+                              <Menu
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                // open={Boolean(anchorEl)}
+                                open={!!anchorEl}
+                                onClose={handleMenuClose}
+                                MenuListProps={{
+                                  'aria-labelledby': 'basic-button',
+                                }}
+                                sx={{
+                                  '& .MuiPaper-root': {
+                                    backgroundColor: '#ffffff',
+                                    boxShadow: '0px 2px 3px rgba(0,0,0,0.05)',
+                                    borderRadius: 4,
+                                    minWidth: 150,
+                                    border: '1px solid #b0b0af',
+                                  },
+                                }}
+                                anchorOrigin={{
+                                  vertical: 'bottom',
+                                  horizontal: 'right',
+                                }}
+                                transformOrigin={{
+                                  vertical: 'top',
+                                  horizontal: 'right',
+                                }}
+                              >
+                                <MenuItem
+                                  onClick={() => {
+                                    setAnchorEl(null);
+                                    onViewItem(clcikedItemId as number);
                                   }}
                                 >
-                                  <Chip
-                                    sx={{ marginBottom: '1px' }}
-                                    label={`${reqObj.nurse_number} nurses`}
-                                    // onClick={handleClick}
-                                    // onDelete={handleDelete}
-                                    icon={<Groups3TwoToneIcon />}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                  />
-                                  <Chip
-                                    sx={{ marginBottom: '1px' }}
-                                    label={`${reqObj.hours_per_shift} hours`}
-                                    // onClick={handleClick}
-                                    // onDelete={handleDelete}
-                                    icon={<ScheduleTwoToneIcon />}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                  />
-                                  <Chip
-                                    sx={{ marginBottom: '1px' }}
-                                    label={`seniority ${reqObj.min_seniority}`}
-                                    // onClick={handleClick}
-                                    // onDelete={handleDelete}
-                                    icon={<SchoolTwoToneIcon />}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                  />
-                                </Box>
-                              </Paper>
-                            </Box>
-                            <Menu
-                              id="basic-menu"
-                              anchorEl={anchorEl}
-                              // open={Boolean(anchorEl)}
-                              open={!!anchorEl}
-                              onClose={handleMenuClose}
-                              MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                              }}
-                              sx={{
-                                '& .MuiPaper-root': {
-                                  backgroundColor: '#ffffff',
-                                  boxShadow: '0px 2px 3px rgba(0,0,0,0.05)',
-                                  borderRadius: 4,
-                                  minWidth: 150,
-                                  border: '1px solid #b0b0af',
-                                },
-                              }}
-                              anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'right',
-                              }}
-                              transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                              }}
-                            >
-                              <MenuItem
-                                onClick={() => {
-                                  setAnchorEl(null);
-                                  onViewItem(clcikedItemId as number);
-                                }}
-                              >
-                                <ListItemIcon>
-                                  <SavedSearchIcon fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText>Detail</ListItemText>
-                              </MenuItem>
-                              <Divider />
+                                  <ListItemIcon>
+                                    <SavedSearchIcon fontSize="small" />
+                                  </ListItemIcon>
+                                  <ListItemText>Detail</ListItemText>
+                                </MenuItem>
+                                <Divider />
 
-                              <MenuItem
-                                disabled={isDue}
-                                onClick={() => {
-                                  setAnchorEl(null);
-                                  onEditItem(clcikedItemId as number);
-                                }}
-                              >
-                                <ListItemIcon>
-                                  <EditCalendarIcon fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText>Edit</ListItemText>
-                              </MenuItem>
-                              <Divider />
-                              <MenuItem
-                                onClick={() => {
-                                  setAnchorEl(null);
-                                  onDeleteItem(clcikedItemId as number);
-                                }}
-                                disabled
-                              >
-                                <ListItemIcon>
-                                  <DeleteSweepIcon fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText>Delete</ListItemText>
-                              </MenuItem>
-                            </Menu>
-                          </Box>
-                        );
-                      })}
+                                <MenuItem
+                                  disabled={isDue}
+                                  onClick={() => {
+                                    setAnchorEl(null);
+                                    onEditItem(clcikedItemId as number);
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <EditCalendarIcon fontSize="small" />
+                                  </ListItemIcon>
+                                  <ListItemText>Edit</ListItemText>
+                                </MenuItem>
+                                {/* <Divider />
+                                <MenuItem
+                                  onClick={() => {
+                                    setAnchorEl(null);
+                                    onDeleteItem(clcikedItemId as number);
+                                  }}
+                                  disabled
+                                >
+                                  <ListItemIcon>
+                                    <DeleteSweepIcon fontSize="small" />
+                                  </ListItemIcon>
+                                  <ListItemText>Delete</ListItemText>
+                                </MenuItem> */}
+                              </Menu>
+                            </Box>
+                          );
+                        })
+                      ) : (
+                        <Chip
+                          label={`No Request`}
+                          sx={{ marginBottom: '5px' }}
+                          //   icon={<Groups3TwoToneIcon />}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      )}
                     </Box>
                   );
                 })}

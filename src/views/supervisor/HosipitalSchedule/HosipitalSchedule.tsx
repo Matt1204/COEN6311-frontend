@@ -15,7 +15,7 @@ interface HospitalScheduleProps {
 
 export default function HospitalSchedule({ propHospitalId }: HospitalScheduleProps) {
   const userSlice = useAppSelector(state => state.user);
-  const { data: fetchedUserInfo, ...othersFetchUser } = useFetchUserQuery(userSlice.email, {
+  const { data: fetchedUserInfo, ...othersFetchUser } = useFetchUserQuery(userSlice.uId, {
     skip: !!propHospitalId,
     refetchOnMountOrArgChange: true,
   });

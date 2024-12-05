@@ -212,6 +212,7 @@ export default function RequestModal({
                         }}
                         sx={{ width: '100%' }}
                         readOnly={!editMode}
+                        displayWeekNumber
                       />
                     </Box>
                   </LocalizationProvider>

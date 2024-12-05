@@ -3,8 +3,14 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useFetchAllHospitalsQuery, Hospital } from '../../../../store/apiSlices/hospitalApiSlice';
 import HospitalSchedule from '../../../supervisor/HosipitalSchedule/HosipitalSchedule';
+import { showAlert } from '../../../../store/alertSlice';
+import { useAppDispatch } from '../../../../store/storeHooks';
+interface HosSchedulePanelProps {
+  initHospitalId?: number;
+}
 
-const HosSchedulePanel: React.FC = () => {
+const HosSchedulePanel: React.FC<HosSchedulePanelProps> = ({ initHospitalId }) => {
+  const dispatch = useAppDispatch();
   const { data: fetchedHospitalList } = useFetchAllHospitalsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -12,9 +18,22 @@ const HosSchedulePanel: React.FC = () => {
   const [hospitalId, setHospitalId] = useState<null | number>(null);
   useEffect(() => {
     if (fetchedHospitalList) {
-      setHospitalId(fetchedHospitalList.data[0].h_id);
+      if (initHospitalId) {
+        console.log('!!!!! HIT:', initHospitalId);
+
+        setHospitalId(initHospitalId);
+
+        dispatch(
+          showAlert({
+            msg: `selected supervisor belongs to ${fetchedHospitalList.data.find(h => h.h_id == initHospitalId)?.h_name}`,
+            severity: 'success',
+          })
+        );
+      } else {
+        setHospitalId(fetchedHospitalList.data[0].h_id);
+      }
     }
-  }, [fetchedHospitalList]);
+  }, [fetchedHospitalList, initHospitalId]);
 
   return (
     <Box

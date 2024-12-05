@@ -72,14 +72,7 @@ export default function PreferenceManagement() {
   // calculate if current week is due(isDue => not editable, !isDue => editable)
   const isDue = useMemo(() => {
     if (startDate) {
-      const today = dayjs();
-      const dayOfWeek = today.day();
-      const daysSinceMonday = (dayOfWeek + 6) % 7;
-      const currentMonday = today.subtract(daysSinceMonday, 'day');
-      const twoWeeksFromMonday = currentMonday.add(13, 'day');
       const dueDate = getNextDayToSubmit().subtract(1, 'day');
-      // return twoWeeksFromMonday.isBefore(startDate);
-      // return startDate.isBefore(twoWeeksFromMonday);
       return startDate.isBefore(dueDate);
     }
   }, [startDate]);

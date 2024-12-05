@@ -34,9 +34,9 @@ interface UpdateUserResponse {
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    fetchUser: builder.query<FetchUserResponse, string>({
-      query: email => ({
-        url: `get-user?email=${encodeURIComponent(email)}`,
+    fetchUser: builder.query<FetchUserResponse, number>({
+      query: u_id => ({
+        url: `get-user?u_id=${encodeURIComponent(u_id)}`,
         method: 'GET',
       }),
       providesTags: (result, error, email) => [{ type: 'User', id: email }],

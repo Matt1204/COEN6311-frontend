@@ -86,6 +86,7 @@ const PrefTopBar: React.FC<PrefTopBarProps> = ({ isDue, isSubmitted, onDatesChan
             value={startDate}
             onChange={newValue => setSelectedDate(newValue)}
             slotProps={{ textField: { size: 'small' } }}
+            displayWeekNumber
           />
           <DatePicker
             label="Ending date"

@@ -35,6 +35,8 @@ interface UserFilterProps {
   onFilterUpdate: (filter: UserFilterType) => void;
   onFilterClear?: () => void;
   nurseOnlyMode?: boolean;
+  isExpandedProp: boolean;
+  onExpandedChange: (expanded: boolean) => void;
 }
 
 const UserFilter: React.FC<UserFilterProps> = ({
@@ -42,9 +44,17 @@ const UserFilter: React.FC<UserFilterProps> = ({
   onFilterUpdate,
   onFilterClear,
   nurseOnlyMode = false,
+  isExpandedProp,
+  onExpandedChange,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
   const [filter, setFilter] = useState(initialFilter);
+
+  // useEffect(() => {
+  //   console.log('from parent:', isExpandedProp);
+
+  //   setIsExpanded(isExpandedProp);
+  // }, [isExpandedProp]);
 
   useEffect(() => {
     onFilterUpdate(filter);
@@ -68,11 +78,15 @@ const UserFilter: React.FC<UserFilterProps> = ({
     <Box sx={{ width: '100%', position: 'relative' }}>
       {/* Accordion Section */}
       <Accordion
-        expanded={isExpanded}
-        onChange={() => setIsExpanded(!isExpanded)}
+        // expanded={isExpanded}
+        expanded={isExpandedProp}
+        // onChange={() => setIsExpanded(!isExpanded)}
+        onChange={(e, expanded) => {
+          onExpandedChange(expanded);
+        }}
         sx={{
           border: '1px solid #ccc',
-          boxShadow: isExpanded ? 4 : 2,
+          boxShadow: isExpandedProp ? 4 : 2,
           borderRadius: '8px',
           '&:before': { display: 'none' }, // Remove MUI default divider
         }}
@@ -121,10 +135,10 @@ const UserFilter: React.FC<UserFilterProps> = ({
             backgroundColor: '#f9f9f9',
             border: '1px solid #ddd',
             borderRadius: '8px',
-            zIndex: isExpanded ? 10 : 'auto',
-            position: isExpanded ? 'absolute' : 'relative',
-            width: isExpanded ? '100%' : 'auto',
-            boxShadow: isExpanded ? 3 : 0,
+            zIndex: isExpandedProp ? 10 : 'auto',
+            position: isExpandedProp ? 'absolute' : 'relative',
+            width: isExpandedProp ? '100%' : 'auto',
+            boxShadow: isExpandedProp ? 3 : 0,
           }}
         >
           {/* Filter Form */}

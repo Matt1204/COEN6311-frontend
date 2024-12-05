@@ -41,6 +41,7 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
       <>
         <NavItem title={'User Management(admin)'} toURL={'/user-management'} />
         <NavItem title={'Schedule Management(admin)'} toURL={'/schedule-management'} />
+        <NavItem title={'genegrate schedule(DEMO)'} toURL={'/generate-schedule'} />
       </>
     ) : userRole == 'nurse' ? (
       <>
@@ -52,7 +53,7 @@ const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
       <>
         <NavItem title={'Hospital Schedule(sup)'} toURL={'/hospital-schedule'} />
         <NavItem title={'Requests Management(sup)'} toURL={'/req-management'} />
-        <NavItem title={'Template Management(sup)'} toURL={'/hospital-template'} />
+        {/* <NavItem title={'Template Management(sup)'} toURL={'/hospital-template'} /> */}
       </>
     );
 

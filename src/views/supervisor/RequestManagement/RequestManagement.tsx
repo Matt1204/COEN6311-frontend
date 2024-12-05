@@ -135,6 +135,7 @@ export default function RequestManagement() {
             setStartDate(startDate);
             setEndDate(endDate);
           }}
+          isDue={isDue as boolean}
         />
         <Box
           sx={{

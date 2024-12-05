@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import UserFilter, { UserFilterType } from '../../UserManagement/components/UserFilter';
 import { useFetchUserListQuery, User } from '../../../../store/apiSlices/userManagementApiSlice';
 import NurseSchedule from '../../../nurse/NurseSchedule/NurseSchedule';
+import { useFetchUserQuery } from '../../../../store/apiSlices/userApiSlice';
 
 export const initialFilter: UserFilterType = {
   email: '',
@@ -17,7 +18,11 @@ export const initialFilter: UserFilterType = {
   hospital_id: null,
 };
 
-const NurSchedulePanel: React.FC = () => {
+interface NurSchedulePanelProps {
+  initUserId?: number;
+}
+
+const NurSchedulePanel: React.FC<NurSchedulePanelProps> = ({ initUserId }) => {
   const [filter, setFilter] = useState<UserFilterType | null>(null);
   const handleFilterUpdate = (filter: UserFilterType) => {
     // console.log(filter);
@@ -41,6 +46,22 @@ const NurSchedulePanel: React.FC = () => {
   const handleSelectUser = (user: User) => {
     setSelectedUser(user.u_id);
   };
+  useEffect(() => {
+    if (initUserId) {
+      // console.log('Setting Init User:', initUserId);
+      setSelectedUser(initUserId);
+    }
+  });
+
+  const { data: fetchedUserInfo, ...others } = useFetchUserQuery(selectedUser as number, {
+    skip: !selectedUser,
+    refetchOnMountOrArgChange: true,
+  });
+
+  const [filterExpanded, setFilterExpanded] = useState(false);
+  useEffect(() => {
+    // fetchedUserInfo && console.log('fetchedUserInfo: ', fetchedUserInfo);
+  });
 
   return (
     <Box
@@ -61,6 +82,10 @@ const NurSchedulePanel: React.FC = () => {
               initialFilter={initialFilter}
               nurseOnlyMode={true}
               onFilterUpdate={handleFilterUpdate}
+              isExpandedProp={filterExpanded}
+              onExpandedChange={expanded => {
+                setFilterExpanded(expanded);
+              }}
             />
           </Grid>
           <Grid size={{ xs: 12, lg: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -72,6 +97,9 @@ const NurSchedulePanel: React.FC = () => {
                   ` ${option.first_name} ${option.last_name}-${option.email}`
                 }
                 isOptionEqualToValue={(option, value) => option.u_id == value.u_id}
+                defaultValue={
+                  !!initUserId && !!fetchedUserInfo ? (fetchedUserInfo.data as User) : undefined
+                }
                 onChange={(e, newValue: User) => {
                   handleSelectUser(newValue);
                 }}

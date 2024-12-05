@@ -9,15 +9,19 @@ import {
   Chip,
   Avatar,
   Typography,
+  Fab,
 } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import UserFilter, { UserFilterType } from './components/UserFilter';
 import {
   useFetchUserListQuery,
   useLazyFetchUserListQuery,
+  User,
 } from '../../../store/apiSlices/userManagementApiSlice';
 import { useFetchAllHospitalsQuery } from '../../../store/apiSlices/hospitalApiSlice';
 
@@ -33,6 +37,8 @@ export const initialFilter: UserFilterType = {
 };
 
 export default function UserManagement() {
+  const navigate = useNavigate();
+
   const { data: fetchedHospitals } = useFetchAllHospitalsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -46,19 +52,22 @@ export default function UserManagement() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+  const [filterExpanded, setFilterExpanded] = useState(false);
 
   // Fetching users
   const [fetchUserList, { data: fetchedUsersData, isLoading, isError }] =
     useLazyFetchUserListQuery();
+
   useEffect(() => {
-    fetchedUsersData && console.log(fetchedUsersData);
+    if (fetchedUsersData) {
+      console.log(fetchedUsersData);
+    }
   }, [fetchedUsersData]);
 
   // initial fetch
   const initialFetch = () => {
     fetchUserList({ filter: initialFilter, page_size: pageSize, current_page: currentPage });
   };
-
   // Fetch initial user list
   useEffect(() => {
     initialFetch();
@@ -67,6 +76,9 @@ export default function UserManagement() {
   // re-fetch
   const handleFetchUser = () => {
     setCurrentPage(1);
+    console.log('HIT...');
+
+    setFilterExpanded(false);
     filter &&
       fetchUserList({
         filter: filter as UserFilterType,
@@ -78,12 +90,22 @@ export default function UserManagement() {
   // re-fetch when page change
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
-    // handleFetchUser();
+    setFilterExpanded(false);
     fetchUserList({
       filter: filter as UserFilterType,
       page_size: pageSize,
       current_page: value,
     });
+  };
+
+  const handleToUserSchedule = (user: User) => {
+    if (user.role == 'nurse') {
+      navigate('/schedule-management', { state: { type: 'nurse', payload: user.u_id } });
+    } else {
+      navigate('/schedule-management', {
+        state: { type: 'supervisor', payload: user.hospital_id },
+      });
+    }
   };
 
   const dataTypographyStyle = {
@@ -124,6 +146,10 @@ export default function UserManagement() {
             initialFilter={initialFilter}
             onFilterUpdate={handleFilterUpdate}
             onFilterClear={initialFetch}
+            isExpandedProp={filterExpanded}
+            onExpandedChange={expanded => {
+              setFilterExpanded(expanded);
+            }}
           />
           <Box>
             <Button
@@ -163,7 +189,6 @@ export default function UserManagement() {
             fetchedUsersData.user_list.map((userObject, index) => {
               return (
                 <Accordion
-                  // expanded={}
                   key={index}
                   sx={{
                     // border: '1px solid #000',
@@ -190,6 +215,24 @@ export default function UserManagement() {
                     </Tooltip>
                   </AccordionSummary>
                   <AccordionDetails>
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: '60px',
+                        right: '100px',
+                      }}
+                    >
+                      {(userObject.role == 'nurse' || userObject.role == 'supervisor') && (
+                        <Fab
+                          color="secondary"
+                          aria-label="edit"
+                          onClick={() => handleToUserSchedule(userObject)}
+                        >
+                          {/* Edit or Create */}
+                          {<EventNoteIcon />}
+                        </Fab>
+                      )}
+                    </Box>
                     {[
                       {
                         label: 'u_id',
